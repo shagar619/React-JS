@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD012 MD026 MD001 MD022 MD032 MD029 MD019 MD034 MD031 MD047 MD040 MD009 MD058 MD024 MD033 MD041 MD045  -->
+<!-- markdownlint-disable MD012 MD026 MD001 MD022 MD032 MD029 MD019 MD034 MD031 MD047 MD040 MD009 MD058 MD024 MD033 MD041 MD045 MD036  -->
 
 <div>
 
@@ -29,7 +29,7 @@ ReactJS is a popular JavaScript library for building user interfaces, particular
 
 ## ⚡ ReactJS Project Setup (Latest Version – 2025)
 
-**✅ Prerequisites:**
+**✅ Prerequisites**
 
 Before starting, make sure you have installed:
 
@@ -40,3 +40,36 @@ Before starting, make sure you have installed:
 - A code editor (e.g., Visual Studio Code)
 
 
+**📦 Create a New React Project (with Vite)**
+
+Using npm:
+```bash
+npm create vite@latest my-app
+```
+
+Using yarn:
+```bash
+yarn create vite@latest my-app
+```
+
+Using pnpm (recommended for large projects):
+```bash
+pnpm create vite@latest my-app
+```
+
+**🛠 Setup Options**
+
+During setup, you’ll be asked:
+
+- Project name → (e.g., `my-app`)
+- Select a framework → `React`
+- Variant → `JavaScript` or `TypeScript`
+
+Example selection:
+```yaml
+✔ Project name: … my-app
+✔ Select a framework: › React
+✔ Select a variant: › JavaScript + SWC (or TypeScript + SWC)
+```
+
+**📂 Navigate & Install Dependencies**
