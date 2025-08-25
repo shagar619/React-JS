@@ -231,3 +231,21 @@ const element = <h1>Hello, JSX!</h1>;
 
 
 ### Props (Properties)
+
+- **Definition:** Props are inputs to a React component. They are passed to the component as an object and can be used to customize the component's behavior and appearance.
+- **Usage:** Props are read-only and should not be modified by the component. They can be of any data type, including strings, numbers, arrays, and objects.
+
+📌 Example:
+
+```tsx
+const Greeting = ({ name, role }) => {
+  return <h1>Hello, {name} - {role}!</h1>;
+};
+
+//usages
+<Greeting name="Alice" role="Admin" />
+<Greeting name="Bob" role="Customer" />
+```
+- In this example, the `Greeting` component accepts a `name` and `role` prop and uses them to render a personalized greeting.
+
+
