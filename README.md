@@ -186,3 +186,32 @@ Preview locally:
 ```bash
 npm run preview
 ```
+
+
+## Building Blocks of React
+
+### Components
+
+- **Definition:** A component is a reusable piece of UI that can be composed to build complex user interfaces. Components can be functional or class-based.
+- **Types of Components:**
+  - **Functional Components:** These are JavaScript functions that return JSX. They can accept props as arguments.
+  - **Class Components:** These are ES6 classes that extend `React.Component` and must contain a `render()` method.
+
+**📌 Example (Professional – E-commerce Product Card):**
+```tsx
+import React from 'react';
+
+const ProductCard = ({ product }) => {
+  return (
+    <div className="border p-4 rounded">
+      <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+      <h2 className="text-xl font-bold">{product.name}</h2>
+      <p className="text-gray-600">{product.description}</p>
+      <span className="text-lg font-semibold">${product.price}</span>
+    </div>
+  );
+};
+
+export default ProductCard;
+```
+
