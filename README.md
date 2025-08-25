@@ -22,3 +22,21 @@ ReactJS is a popular JavaScript library for building user interfaces, particular
 10. **State Management**: React provides several options for state management, including local component state, Context API, and external libraries like Redux and MobX. This flexibility allows developers to choose the best approach for their application's needs.
 11. **SSR & Full-Stack Development**: React can be used for server-side rendering (SSR) and full-stack development with frameworks like Next.js. SSR improves performance and SEO by rendering components on the server, while full-stack solutions enable developers to build complete applications with both front-end and back-end functionality.
 12. **Testing**: React has a strong emphasis on testing, with tools like Jest and React Testing Library making it easier to write unit tests and integration tests for components. This focus on testing helps ensure the reliability and maintainability of React applications.
+
+
+
+
+
+## ⚡ ReactJS Project Setup (Latest Version – 2025)
+
+**✅ Prerequisites:**
+
+Before starting, make sure you have installed:
+
+- Node.js (LTS version ≥ 18 or 20) → Download here(https://nodejs.org/)
+(Check version: `node -v`)
+- npm (comes with Node) or yarn or pnpm
+(Check version: `npm -v`)
+- A code editor (e.g., Visual Studio Code)
+
+
