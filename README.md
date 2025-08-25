@@ -29,7 +29,7 @@ ReactJS is a popular JavaScript library for building user interfaces, particular
 
 ## ⚡ ReactJS Project Setup (Latest Version – 2025)
 
-**✅ Prerequisites**
+#### ✅ Prerequisites
 
 Before starting, make sure you have installed:
 
@@ -40,7 +40,7 @@ Before starting, make sure you have installed:
 - A code editor (e.g., Visual Studio Code)
 
 
-**📦 Create a New React Project (with Vite)**
+#### 📦 Create a New React Project (with Vite)
 
 Using npm:
 ```bash
@@ -57,7 +57,7 @@ Using pnpm (recommended for large projects):
 pnpm create vite@latest my-app
 ```
 
-**🛠 Setup Options**
+#### 🛠 Setup Options
 
 During setup, you’ll be asked:
 
@@ -72,14 +72,14 @@ Example selection:
 ✔ Select a variant: › JavaScript + SWC (or TypeScript + SWC)
 ```
 
-**📂 Navigate & Install Dependencies**
+#### 📂 Navigate & Install Dependencies
 
 ```bash
 cd my-app
 npm install
 ```
 
-**▶️ Run Development Server**
+#### ▶️ Run Development Server
 
 Start the local server:
 ```bash
@@ -88,7 +88,7 @@ npm run dev
 - By default → runs at `http://localhost:5173/`
 
 
-**🧩 Project Structure (Vite + React)**
+#### 🧩 Project Structure (Vite + React)
 
 After setup, you’ll see:
 
@@ -108,7 +108,7 @@ my-app
 └── tsconfig.json
 ```
 
-**🖼 Modify Your First Component**
+#### 🖼 Modify Your First Component
 
 Open `src/App.tsx` and make the following changes:
 
@@ -130,3 +130,59 @@ function App() {
 ```
 - Save → browser auto-refreshes.
 
+
+#### 🎨 Adding Styling
+
+**Option 1: Plain CSS**
+
+Create `src/App.css` and import it:
+```tsx
+import './App.css';
+```
+
+**Option 2: TailwindCSS (modern styling)**
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+Update `tailwind.config.js`:
+```js
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+```
+
+Add the Tailwind directives to your `src/App.css`:
+```css
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
+
+Now you can use classes like:
+
+```html
+<div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <h1 class="text-4xl font-bold">Hello, Tailwind CSS!</h1>
+</div>
+```
+
+#### 📦 Build for Production
+
+```bash
+npm run build
+```
+
+This will create an optimized build of your application in the `dist` directory.
+
+Preview locally:
+```bash
+npm run preview
+```
