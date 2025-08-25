@@ -73,3 +73,60 @@ Example selection:
 ```
 
 **📂 Navigate & Install Dependencies**
+
+```bash
+cd my-app
+npm install
+```
+
+**▶️ Run Development Server**
+
+Start the local server:
+```bash
+npm run dev
+```
+- By default → runs at `http://localhost:5173/`
+
+
+**🧩 Project Structure (Vite + React)**
+
+After setup, you’ll see:
+
+```
+my-app
+├── node_modules
+├── public
+│   └── vite.svg
+├── src
+│   ├── App.css
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── assets
+│       └── vite.svg
+├── index.html
+├── package.json
+└── tsconfig.json
+```
+
+**🖼 Modify Your First Component**
+
+Open `src/App.tsx` and make the following changes:
+
+1. Import the logo:
+```tsx
+import logo from './assets/vite.svg';
+```
+
+2. Open `src/App.jsx` and change:
+```tsx
+function App() {
+  return (
+    <div>
+      <h1>Hello, React 2025! 🚀</h1>
+      <img src={logo} alt="Vite logo" />
+    </div>
+  );
+}
+```
+- Save → browser auto-refreshes.
+
