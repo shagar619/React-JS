@@ -215,3 +215,19 @@ const ProductCard = ({ product }) => {
 export default ProductCard;
 ```
 
+### JSX (JavaScript XML)
+
+- **Definition:** JSX is a syntax extension for JavaScript that looks similar to HTML. It allows you to write HTML-like code within JavaScript, making it easier to create and visualize the structure of your UI.
+- **Usage:** JSX is commonly used with React to describe what the UI should look like. Babel compiles JSX down to `React.createElement()` calls, which return plain JavaScript objects representing the DOM.
+
+📌 Example:
+
+```tsx
+const element = <h1>Hello, JSX!</h1>;
+```
+- Allows dynamic rendering based on JS values.
+
+> **Note:** JSX must be transpiled to JavaScript before it can be executed in the browser.
+
+
+### Props (Properties)
