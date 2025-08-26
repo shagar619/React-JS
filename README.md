@@ -535,3 +535,33 @@ export default UserProfile;
 > **Note:** In this example, the `UserProfile` component uses conditional rendering to display different content based on the user's login status. When the user is logged in, a welcome message and logout button are shown; otherwise, a login prompt is displayed.
 
 
+
+
+### Lists & Keys
+
+- **Definition:** In React, you often work with lists of data. Rendering lists efficiently requires a unique "key" for each list item.
+- **Keys:** Keys help React identify which items have changed, are added, or are removed. They should be unique among siblings.
+- Render multiple items with `.map()`.
+- Keys help React identify elements and update efficiently.
+
+📌 Example:
+
+```tsx
+import React from 'react';
+
+const TodoList = ({ todos }) => {
+  return (
+    <ul>
+      {todos.map(todo => (
+        <li key={todo.id}>{todo.text}</li>
+      ))}
+    </ul>
+  );
+};
+
+export default TodoList;
+```
+
+> **Note:** In this example, the `TodoList` component renders a list of todo items. Each item has a unique `key` prop, which is essential for efficient updates and re-renders.
+
+
