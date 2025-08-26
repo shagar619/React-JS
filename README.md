@@ -608,365 +608,22 @@ export default TodoList;
 - `useLayoutEffect()`: Similar to `useEffect()`, but runs before the browser layout is updated.
 
 
-📌 Example:
-
-Class Component Version:
+📌 Example (Professional – Fetching API Data):
 ```tsx
-import React, { Component } from 'react';
+function Users() {
+  const [users, setUsers] = React.useState([]);
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-}
+  React.useEffect(() => {
+    fetch("/api/users")
+      .then(res => res.json())
+      .then(data => setUsers(data));
+  }, []); // Runs once after component mounts
 
-interface UserProfileProps {
-  userId: number;
-}
-
-interface UserProfileState {
-  user: User | null;
-  loading: boolean;
-  error: string | null;
-  editMode: boolean;
-  formData: Partial<User>;
-}
-
-class UserProfileClass extends Component<UserProfileProps, UserProfileState> {
-  private abortController: AbortController | null = null;
-  private intervalId: number | null = null;
-
-  constructor(props: UserProfileProps) {
-    super(props);
-    
-    // Initialize state
-    this.state = {
-      user: null,
-      loading: false,
-      error: null,
-      editMode: false,
-      formData: {}
-    };
-
-    // Bind methods (or use arrow functions)
-    this.handleEdit = this.handleEdit.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-  }
-
-  async componentDidMount() {
-    // Component has mounted - fetch initial data
-    console.log('Component mounted, fetching user data');
-    await this.fetchUser();
-    
-    // Set up polling for real-time updates
-    this.intervalId = window.setInterval(() => {
-      if (!this.state.editMode) {
-        this.fetchUser();
-      }
-    }, 30000); // Poll every 30 seconds
-  }
-
-  async componentDidUpdate(prevProps: UserProfileProps, prevState: UserProfileState) {
-    // Component updated - check if we need to fetch new data
-    if (prevProps.userId !== this.props.userId) {
-      console.log('User ID changed, fetching new user');
-      await this.fetchUser();
-    }
-
-    // Log state changes for debugging
-    if (prevState.editMode !== this.state.editMode) {
-      console.log(`Edit mode ${this.state.editMode ? 'enabled' : 'disabled'}`);
-    }
-  }
-
-  componentWillUnmount() {
-    // Cleanup before component is destroyed
-    console.log('Component unmounting, cleaning up');
-    
-    // Cancel any pending requests
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-    
-    // Clear intervals
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
-  }
-
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // Handle errors in child components
-    console.error('Error caught in UserProfile:', error, errorInfo);
-    this.setState({ error: 'Something went wrong loading the user profile' });
-  }
-
-  private async fetchUser() {
-    // Cancel previous request if still pending
-    if (this.abortController) {
-      this.abortController.abort();
-    }
-    
-    this.abortController = new AbortController();
-    
-    this.setState({ loading: true, error: null });
-    
-    try {
-      const response = await fetch(`/api/users/${this.props.userId}`, {
-        signal: this.abortController.signal
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user: ${response.status}`);
-      }
-      
-      const user = await response.json();
-      this.setState({ user, loading: false });
-    } catch (error: any) {
-      if (error.name !== 'AbortError') {
-        this.setState({ 
-          error: error.message || 'Failed to load user', 
-          loading: false 
-        });
-      }
-    }
-  }
-
-  private handleEdit() {
-    this.setState({ 
-      editMode: true, 
-      formData: { ...this.state.user } 
-    });
-  }
-
-  private async handleSave() {
-    if (!this.state.user) return;
-
-    try {
-      const response = await fetch(`/api/users/${this.state.user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.state.formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-
-      const updatedUser = await response.json();
-      this.setState({ 
-        user: updatedUser, 
-        editMode: false, 
-        formData: {} 
-      });
-    } catch (error: any) {
-      this.setState({ error: error.message });
-    }
-  }
-
-  render() {
-    const { user, loading, error, editMode, formData } = this.state;
-
-    if (loading) return <div>Loading user profile...</div>;
-    if (error) return <div>Error: {error}</div>;
-    if (!user) return <div>No user found</div>;
-
-    return (
-      <div className="user-profile">
-        <img src={user.avatar} alt={`${user.name}'s avatar`} />
-        
-        {editMode ? (
-          <div>
-            <input
-              value={formData.name || ''}
-              onChange={e => this.setState({
-                formData: { ...formData, name: e.target.value }
-              })}
-              placeholder="Name"
-            />
-            <input
-              value={formData.email || ''}
-              onChange={e => this.setState({
-                formData: { ...formData, email: e.target.value }
-              })}
-              placeholder="Email"
-            />
-            <button onClick={this.handleSave}>Save</button>
-            <button onClick={() => this.setState({ editMode: false })}>
-              Cancel
-            </button>
-          </div>
-        ) : (
-          <div>
-            <h2>{user.name}</h2>
-            <p>{user.email}</p>
-            <button onClick={this.handleEdit}>Edit</button>
-          </div>
-        )}
-      </div>
-    );
-  }
+  return <div>{users.map(u => <p key={u.id}>{u.name}</p>)}</div>;
 }
 ```
 
-Function Component with Hooks Version:
-```tsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  avatar: string;
-}
-
-interface UserProfileProps {
-  userId: number;
-}
-
-function UserProfileHooks({ userId }: UserProfileProps) {
-  // useState replaces this.state
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState<Partial<User>>({});
-
-  // useRef for mutable values that don't trigger re-renders
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const intervalRef = useRef<number | null>(null);
-
-  // useCallback to memoize functions (prevents unnecessary re-renders)
-  const fetchUser = useCallback(async () => {
-    // Cancel previous request
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    
-    abortControllerRef.current = new AbortController();
-    
-    setLoading(true);
-    setError(null);
-    
-    try {
-      const response = await fetch(`/api/users/${userId}`, {
-        signal: abortControllerRef.current.signal
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user: ${response.status}`);
-      }
-      
-      const userData = await response.json();
-      setUser(userData);
-    } catch (err: any) {
-      if (err.name !== 'AbortError') {
-        setError(err.message || 'Failed to load user');
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]); // Dependency array - recreate when userId changes
-
-  // useEffect replaces componentDidMount, componentDidUpdate, componentWillUnmount
-  useEffect(() => {
-    console.log('Effect: Fetching user data');
-    fetchUser();
-
-    // Set up polling (like componentDidMount)
-    intervalRef.current = window.setInterval(() => {
-      if (!editMode) {
-        fetchUser();
-      }
-    }, 30000);
-
-    // Cleanup function (like componentWillUnmount)
-    return () => {
-      console.log('Effect cleanup: Canceling requests and clearing interval');
-      
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-      
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [fetchUser, editMode]); // Re-run when fetchUser or editMode changes
-
-  // Separate useEffect for logging edit mode changes (like componentDidUpdate)
-  useEffect(() => {
-    console.log(`Edit mode ${editMode ? 'enabled' : 'disabled'}`);
-  }, [editMode]);
-
-  const handleEdit = useCallback(() => {
-    setEditMode(true);
-    setFormData({ ...user });
-  }, [user]);
-
-  const handleSave = useCallback(async () => {
-    if (!user) return;
-
-    try {
-      const response = await fetch(`/api/users/${user.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData)
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-      setEditMode(false);
-      setFormData({});
-    } catch (err: any) {
-      setError(err.message);
-    }
-  }, [user, formData]);
-
-  const handleCancel = useCallback(() => {
-    setEditMode(false);
-    setFormData({});
-  }, []);
-
-  // Render logic (same as class component render method)
-  if (loading) return <div>Loading user profile...</div>;
-  if (error) return <div>Error: {error}</div>;
-  if (!user) return <div>No user found</div>;
-
-  return (
-    <div className="user-profile">
-      <img src={user.avatar} alt={`${user.name}'s avatar`} />
-      
-      {editMode ? (
-        <div>
-          <input
-            value={formData.name || ''}
-            onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
-            placeholder="Name"
-          />
-          <input
-            value={formData.email || ''}
-            onChange={e => setFormData(prev => ({ ...prev, email: e.target.value }))}
-            placeholder="Email"
-          />
-          <button onClick={handleSave}>Save</button>
-          <button onClick={handleCancel}>Cancel</button>
-        </div>
-      ) : (
-        <div>
-          <h2>{user.name}</h2>
-          <p>{user.email}</p>
-          <button onClick={handleEdit}>Edit</button>
-        </div>
-      )}
-    </div>
-  );
-}
-```
 
 Custom Hook for Data Fetching;
 ```tsx
@@ -1021,5 +678,30 @@ function UserProfile({ userId }: { userId: number }) {
   return <div>{user.name}</div>;
 }
 ```
+
+
+### Context API
+
+- Solves prop drilling (passing props too deep).
+- Provides global state accessible by any component.
+
+📌 Example (Professional – Dark Mode Theme):
+```tsx
+const ThemeContext = React.createContext();
+
+function App() {
+  return (
+    <ThemeContext.Provider value="dark">
+      <Navbar />
+    </ThemeContext.Provider>
+  );
+}
+
+function Navbar() {
+  const theme = React.useContext(ThemeContext);
+  return <nav className={theme}>Navbar</nav>;
+}
+```
+
 
 
