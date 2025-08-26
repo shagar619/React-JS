@@ -435,3 +435,59 @@ export default Counter;
 > **Note:** In this example, the `Counter` component uses the `useState` hook to manage its `count` state. When the button is clicked, the `increment` function updates the state, causing the component to re-render with the new count value.
 
 
+### Events
+
+- **Definition:** Events are actions or occurrences that happen in the application, usually as a result of user interactions (e.g., clicks, form submissions).
+- **Handling Events:** In React, you can handle events using event handlers, which are functions that are called in response to specific events.
+
+HTML: 
+```html
+<button onclick="handleClick()">Click Me</button>
+```
+React:
+```tsx
+<button onClick={handleClick}>Click Me</button>
+```
+- **Synthetic Events:** React creates a synthetic event system that wraps the browser's native events. This ensures consistent behavior across different browsers.
+- **Preventing Default Behavior:** In React, you can prevent the default behavior of an event (e.g., form submission) by calling `event.preventDefault()` in your event handler.
+
+📌 Example:
+
+```tsx
+import React, 'useState' from 'react';
+import './ToggleSwitch.css'; // For styling
+
+const ToggleSwitch = () => {
+  // 1. State to keep track of whether the switch is on or off
+  const [isOn, setIsOn] = useState(false);
+
+  // 2. The event handler function
+  // This function is called whenever the click event occurs.
+  const handleToggle = () => {
+    // We update the state to the opposite of its current value.
+    // This will trigger a re-render.
+    setIsOn(currentStatus => !currentStatus);
+  };
+
+  // Dynamically determine the CSS class based on the 'isOn' state
+  const switchClassName = `switch-container ${isOn ? 'on' : 'off'}`;
+
+  return (
+    <div>
+      {/* 3. The event listener 'onClick' is attached to this div */}
+      {/* When clicked, it will execute the handleToggle function */}
+      <div className={switchClassName} onClick={handleToggle}>
+        <div className="switch-handle"></div>
+      </div>
+      <p>The switch is currently: <strong>{isOn ? 'ON' : 'OFF'}</strong></p>
+    </div>
+  );
+};
+
+export default ToggleSwitch;
+```
+
+> **Note:** In this example, the `ToggleSwitch` component uses the `onClick` event to toggle its state between "ON" and "OFF". The visual representation of the switch changes based on the state, demonstrating how events can drive UI updates in React.
+
+
+
