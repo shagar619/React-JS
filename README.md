@@ -327,19 +327,76 @@ const element = <h1>Hello, JSX!</h1>;
 ### Props (Properties)
 
 - **Definition:** Props are inputs to a React component. They are passed to the component as an object and can be used to customize the component's behavior and appearance.
+- **Unidirectional Data Flow:** Data in React flows in one direction: from top to bottom (parent to child). A child component cannot directly change the props it receives from its parent. This makes the data flow predictable and easier to debug.
+- **Read-Only (Immutable):** A component must never modify its own props. They are owned by the parent component. If a component needs to manage data that changes over time in response to user interaction, it should use state, not props.
 - **Usage:** Props are read-only and should not be modified by the component. They can be of any data type, including strings, numbers, arrays, and objects.
 
 📌 Example:
 
+The Reusable Child Component: `StatCard.tsx`:
+
+This component is designed to be a generic card for displaying a single statistic. It's highly reusable because its icon, label, and value are all passed in via props.
+
 ```tsx
-const Greeting = ({ name, role }) => {
-  return <h1>Hello, {name} - {role}!</h1>;
+import React from 'react';
+
+const StatCard = ({ icon, label, value }) => {
+  return (
+    <div className="border p-4 rounded">
+      <div className="flex items-center">
+        <img src={icon} alt={label} className="w-8 h-8 mr-2" />
+        <span className="font-bold">{label}:</span>
+      </div>
+      <p className="text-lg">{value}</p>
+    </div>
+  );
 };
 
-//usages
-<Greeting name="Alice" role="Admin" />
-<Greeting name="Bob" role="Customer" />
+export default StatCard;
 ```
-- In this example, the `Greeting` component accepts a `name` and `role` prop and uses them to render a personalized greeting.
+
+The Parent Component: `Dashboard.tsx`:
+
+This is the main component that holds the data and orchestrates the child components. It passes the necessary data down to WelcomeBanner and StatCard using props.
+
+```tsx
+import React from 'react';
+import WelcomeBanner from './WelcomeBanner';
+import StatCard from './StatCard';
+import './Dashboard.css';
+
+const Dashboard = () => {
+  // Data that lives in the parent component.
+  const currentUser = 'Maria';
+  const dashboardStats = [
+    { id: 1, icon: '📈', label: 'Sales', value: '1,250' },
+    { id: 2, icon: '👥', label: 'New Users', value: '82' },
+    { id: 3, icon: '💬', label: 'Messages', value: '15' },
+  ];
+
+  return (
+    <div className="dashboard">
+      {/* Passing the 'currentUser' variable as the 'username' prop */}
+      <WelcomeBanner username={currentUser} />
+
+      <div className="stats-container">
+        {/* Reusing the StatCard component with different props */}
+        {dashboardStats.map(stat => (
+          <StatCard
+            key={stat.id} // 'key' is a special prop for lists
+            icon={stat.icon}
+            label={stat.label}
+            value={stat.value}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
+```
+
+> **Note:** The `Dashboard` component is responsible for managing the state and data of the dashboard, while the `StatCard` component is a presentational component that displays individual statistics. This separation of concerns makes the code more modular and easier to maintain.
 
 
