@@ -491,3 +491,47 @@ export default ToggleSwitch;
 
 
 
+### Conditional Rendering
+
+- **Definition:** Conditional rendering in React allows you to render different UI elements or components based on certain conditions (e.g., user authentication status, form validation).
+- **Techniques:** You can use JavaScript operators like `if`, `&&`, and `? :` (ternary operator) to implement conditional rendering.
+
+📌 Example:
+
+```tsx
+import React, { useState } from 'react';
+
+const UserProfile = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+  };
+
+  return (
+    <div>
+      {isLoggedIn ? (
+        <div>
+          <h2>Welcome back!</h2>
+          <button onClick={handleLogout}>Logout</button>
+        </div>
+      ) : (
+        <div>
+          <h2>Please log in.</h2>
+          <button onClick={handleLogin}>Login</button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default UserProfile;
+```
+
+> **Note:** In this example, the `UserProfile` component uses conditional rendering to display different content based on the user's login status. When the user is logged in, a welcome message and logout button are shown; otherwise, a login prompt is displayed.
+
+
