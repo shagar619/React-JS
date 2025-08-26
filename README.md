@@ -400,3 +400,38 @@ export default Dashboard;
 > **Note:** The `Dashboard` component is responsible for managing the state and data of the dashboard, while the `StatCard` component is a presentational component that displays individual statistics. This separation of concerns makes the code more modular and easier to maintain.
 
 
+
+### State
+
+- **Definition:** State is a built-in object in React that allows components to manage their own data. Unlike props, which are passed from parent to child, state is managed within the component itself.
+- **Internal and Private:** State is encapsulated within the component that owns and manages it. It cannot be accessed or modified directly by any other component. To share state, the owner component must pass it down as props to child components.
+- **Mutable:** State is mutable, meaning it can be changed over time, typically in response to user actions or network responses.
+- **Triggers Re-Renders:** When the state changes, React re-renders the component to reflect the new state.
+- **Usage:** State is used to store data that a component needs to render. When the state changes, the component re-renders to reflect the new state.
+
+📌 Example:
+
+```tsx
+import React, { useState } from 'react';
+
+const Counter = () => {
+  const [count, setCount] = useState(0);
+
+  const increment = () => {
+    setCount(count + 1);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>Increment</button>
+    </div>
+  );
+};
+
+export default Counter;
+```
+
+> **Note:** In this example, the `Counter` component uses the `useState` hook to manage its `count` state. When the button is clicked, the `increment` function updates the state, causing the component to re-render with the new count value.
+
+
