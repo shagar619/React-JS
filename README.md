@@ -777,3 +777,83 @@ function MyComponent(props) {
 const MyComponentWithLogging = withLogging(MyComponent);
 ```
 
+### 🔹What is virtual DOM in React?
+
+The Virtual DOM is a lightweight, in-memory tree (plain JS objects) that describes what the UI should look like. When props/state change, React re-renders components to produce a new VDOM tree, diffs it against the previous one (“reconciliation”), computes the minimal set of real DOM mutations, and commits those updates to the browser DOM.
+
+Mentally model in 3 phases:
+
+1. **Render (pure, can be interrupted)**
+
+    - run and return React elements → a new VDOM.
+    - React compares (diffs) new vs. old VDOM.
+2. **Reconcile (diffing rules)**
+    - Same component type → compare props/children recursively.
+    - Different type → unmount old subtree, mount new.
+    - Lists → React uses keys to match children across renders. Stable keys = surgical updates.
+3. **Commit (synchronous, cannot be interrupted)**
+    - React applies the minimal DOM ops (insert/remove nodes, set attributes, update text).
+    - Runs layout effects, ref updates, etc.
+
+
+📌 Example (live order dashboard):
+
+Scenario: A food-delivery ops dashboard shows 500+ active orders updating via WebSocket (status, ETA, courier location). We want only the changed rows to touch the DOM.
+```tsx
+// OrderRow.tsx
+import React from "react";
+
+const OrderRow = React.memo(function OrderRow({ order }) {
+  return (
+    <tr data-id={order.id}>
+      <td>{order.id}</td>
+      <td>{order.customer}</td>
+      <td>{order.restaurant}</td>
+      <td>{order.status}</td> {/* only this cell often changes */}
+      <td>{order.eta} min</td>
+    </tr>
+  );
+});
+
+export default OrderRow;
+```
+
+```tsx
+// OrdersTable.tsx
+import React from "react";
+import OrderRow from "./OrderRow";
+
+export default function OrdersTable({ socket }) {
+  const [orders, setOrders] = React.useState([]);
+
+  // Load initial page
+  React.useEffect(() => {
+    fetch("/api/orders")
+      .then(r => r.json())
+      .then(setOrders);
+  }, []);
+
+  // Live updates
+  React.useEffect(() => {
+    const handler = (msg) => {
+      const update = JSON.parse(msg.data); // {id, status, eta}
+      setOrders(prev =>
+        prev.map(o => (o.id === update.id ? { ...o, ...update } : o))
+      );
+    };
+    socket.addEventListener("message", handler);
+    return () => socket.removeEventListener("message", handler);
+  }, [socket]);
+
+  return (
+    <table>
+      <tbody>
+        {orders.map(o => (
+          <OrderRow key={o.id} order={o} />
+        ))}
+      </tbody>
+    </table>
+  );
+}
+```
+
