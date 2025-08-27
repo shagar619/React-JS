@@ -625,7 +625,7 @@ function Users() {
 
 
 
-Custom Hook for Data Fetching;
+📌 Example Custom Hook for Data Fetching;
 ```tsx
 function useUser(userId: number) {
   const [user, setUser] = useState<User | null>(null);
@@ -702,6 +702,48 @@ function Navbar() {
   return <nav className={theme}>Navbar</nav>;
 }
 ```
+> Used in multi-page apps (Google Docs, Notion) for global settings (theme, language).
 
 
+### Fragments
+
+- Allow grouping multiple elements without extra nodes.
+- Use `<React.Fragment>` or shorthand `<>...</>`.
+
+📌 Example (List without extra div):
+```tsx
+function Items() {
+  return (
+    <>
+      <li>Item 1</li>
+      <li>Item 2</li>
+    </>
+  );
+}
+```
+
+
+### Refs
+
+- Provide a way to access DOM nodes or React elements created in the render method.
+- Created using `React.createRef()` or `useRef()` hook.
+
+📌 Example (Professional – Accessing DOM Element):
+```tsx
+function TextInput() {
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  function focusInput() {
+    inputRef.current?.focus();
+  }
+
+  return (
+    <>
+      <input ref={inputRef} type="text" />
+      <button onClick={focusInput}>Focus the input</button>
+    </>
+  );
+}
+```
+> Used in form inputs, animations, and integrating with third-party DOM libraries.
 
