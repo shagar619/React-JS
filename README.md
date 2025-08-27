@@ -933,9 +933,119 @@ export const router = createBrowserRouter([
           { path: "trending", Component: ConcertsTrending },
         ],
       },
+      { path: "concerts/:id", Component: ConcertDetails },
+      { path: "*", Component: NotFound },
     ],
   },
 ]);
 ```
 
+`Root.tsx`
+```tsx
+import { Outlet } from "react-router-dom";
 
+export default function Root() {
+  return (
+    <>
+      <header>
+        <h1>My App</h1>
+        <nav>
+          <a href="/">Home</a> | <a href="/about">About</a> |{" "}
+          <a href="/auth/login">Login</a>
+        </nav>
+      </header>
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
+}
+```
+
+**Features with React Router v6**
+
+✅ Programmatic navigation
+```tsx
+import { useNavigate } from "react-router-dom";
+
+function LoginForm() {
+  const navigate = useNavigate();
+
+  function handleSubmit(event: React.FormEvent) {
+    event.preventDefault();
+    // Perform login logic
+    navigate("/dashboard");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {/* form fields */}
+      <button type="submit">Login</button>
+    </form>
+  );
+}
+```
+
+✅ Nested Routes
+```tsx
+import { Outlet } from "react-router-dom";
+
+function Dashboard() {
+  return (
+    <div>
+      <h2>Dashboard</h2>
+      <Outlet />
+    </div>
+  );
+}
+
+function Profile() {
+  return <h3>Profile</h3>;
+}
+
+function Settings() {
+  return <h3>Settings</h3>;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="dashboard" element={<Dashboard />}>
+        <Route path="profile" element={<Profile />} />
+        <Route path="settings" element={<Settings />} />
+      </Route>
+    </Routes>
+  );
+}
+```
+
+✅ Error Boundaries (v6.4+)
+```tsx
+import { useRouteError } from "react-router-dom";
+
+export function ErrorBoundary() {
+  let error = useRouteError();
+  console.error(error);
+
+  return (
+    <div>
+      <h1>Oops!</h1>
+      <p>Sorry, an unexpected error has occurred.</p>
+      <p>
+        <i>{error.statusText || error.message}</i>
+      </p>
+    </div>
+  );
+}
+```
+
+✅ Data Loading (v6.4+)
+```tsx
+<Route
+  path="/products/:id"
+  element={<ProductDetails />}
+  loader={async ({ params }) => {
+    return fetch(`/api/products/${params.id}`);
+  }}
+/>
+```
