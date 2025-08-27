@@ -964,24 +964,31 @@ export default function Root() {
 
 **Features with React Router v6**
 
-✅ Programmatic navigation
-```tsx
-import { useNavigate } from "react-router-dom";
+✅ Navigation state and GET forms (URL-driven search)
+- useNavigation gives pending state; GET Forms update the URL and loaders respond to query changes.
+```jsx
+import { Form, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
 
-function LoginForm() {
-  const navigate = useNavigate();
+// loader reads query
+export async function loader({ request }) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") ?? "";
+  const results = await fetch(`/api/search?q=${encodeURIComponent(q)}`).then(r => r.json());
+  return { q, results };
+}
 
-  function handleSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    // Perform login logic
-    navigate("/dashboard");
-  }
+function SearchPage() {
+  const { q, results } = useLoaderData();
+  const nav = useNavigation();
+  const submit = useSubmit();
 
   return (
-    <form onSubmit={handleSubmit}>
-      {/* form fields */}
-      <button type="submit">Login</button>
-    </form>
+    <>
+      <Form role="search" method="get" onChange={(e) => submit(e.currentTarget)}>
+        <input name="q" defaultValue={q} placeholder="Search…" />
+      </Form>
+      {nav.state === "loading" ? <p>Searching…</p> : <pre>{JSON.stringify(results, null, 2)}</pre>}
+    </>
   );
 }
 ```
@@ -1019,33 +1026,270 @@ export default function App() {
 }
 ```
 
-✅ Error Boundaries (v6.4+)
-```tsx
-import { useRouteError } from "react-router-dom";
+✅ Route loaders: fetch data where the route is defined
 
-export function ErrorBoundary() {
-  let error = useRouteError();
-  console.error(error);
+- The loader runs before a route renders and returns the data for that route.
+- It receives params, request, and an abort signal.
+```jsx
+// routes/post.jsx
+import { useLoaderData } from "react-router-dom";
 
+export async function loader({ params, signal }) {
+  const res = await fetch(`/api/posts/${params.postId}`, { signal });
+  if (!res.ok) throw res; // Will be caught by errorElement
+  return res.json();
+}
+
+export default function Post() {
+  const post = useLoaderData();
+  return <article><h1>{post.title}</h1><p>{post.body}</p></article>;
+}
+```
+
+
+✅ Route actions + <Form>: mutations with built‑in navigation and validation
+
+- Actions handle non-GET submissions. Use Form to submit without manual event handlers.
+- Return `redirect()` to navigate or `json()` with errors to show validation messages.
+```jsx
+// routes/post.jsx
+import { Form, useActionData, useNavigation, json, redirect } from "react-router-dom";
+
+export async function action({ request, params }) {
+  const form = await request.formData();
+  const body = form.get("body");
+  if (!body?.trim()) {
+    return json({ errors: { body: "Comment is required" } }, { status: 400 });
+  }
+  const res = await fetch(`/api/posts/${params.postId}/comments`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ body }),
+  });
+  if (!res.ok) throw res;
+  return redirect(`/posts/${params.postId}`);
+}
+
+function CommentForm() {
+  const errors = useActionData();
+  const nav = useNavigation();
+  const busy = nav.state === "submitting";
   return (
-    <div>
-      <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
-      <p>
-        <i>{error.statusText || error.message}</i>
-      </p>
-    </div>
+    <Form method="post">
+      <textarea name="body" />
+      {errors?.errors?.body && <p role="alert">{errors.errors.body}</p>}
+      <button disabled={busy}>{busy ? "Saving..." : "Add comment"}</button>
+    </Form>
   );
 }
 ```
 
+
+
+✅ Error boundaries for loaders/actions (errorElement)
+- Throw Responses (or plain errors) in loaders/actions and render a route-specific error UI.
+```jsx
+// routes/post.jsx
+import { useRouteError, isRouteErrorResponse } from "react-router-dom";
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+  if (isRouteErrorResponse(error)) {
+    return <p>{error.status} {error.statusText}</p>;
+  }
+  return <p>Something went wrong.</p>;
+}
+```
+
+✅ Deferred data + streaming UI (defer/Await)
+
+- Render critical data immediately and stream the rest later with `Suspense/Await`.
+```jsx
+// routes/post.jsx
+import { defer, Await } from "react-router-dom";
+import { Suspense } from "react";
+
+export async function loader({ params, signal }) {
+  const post = fetch(`/api/posts/${params.postId}`, { signal }).then(r => r.json());
+  const comments = fetch(`/api/posts/${params.postId}/comments`, { signal }).then(r => r.json());
+
+  // Wait for post (critical), stream comments
+  return defer({ post: await post, comments });
+}
+
+export default function Post() {
+  const data = useLoaderData();
+  return (
+    <article>
+      <h1>{data.post.title}</h1>
+      <Suspense fallback={<p>Loading comments…</p>}>
+        <Await resolve={data.comments} errorElement={<p>Failed to load comments</p>}>
+          {(comments) => <ul>{comments.map(c => <li key={c.id}>{c.body}</li>)}</ul>}
+        </Await>
+      </Suspense>
+    </article>
+  );
+}
+```
+
+✅ Fetchers: call loaders/actions without navigation
+
+- Perfect for toggles, side panels, typeahead, etc.
+```jsx
+import { useFetcher } from "react-router-dom";
+
+function FavoriteButton({ postId, initialFavorite }) {
+  const fetcher = useFetcher();
+  const optimistic = fetcher.formData
+    ? fetcher.formData.get("favorite") === "true"
+    : initialFavorite;
+
+  return (
+    <fetcher.Form method="post" action={`/posts/${postId}/favorite`}>
+      <input type="hidden" name="favorite" value={(!optimistic).toString()} />
+      <button disabled={fetcher.state !== "idle"}>
+        {optimistic ? "★ Favorited" : "☆ Favorite"}
+      </button>
+    </fetcher.Form>
+  );
+}
+
+// route config:
+// { path: "posts/:postId/favorite", action: favoriteAction }
+export async function favoriteAction({ request, params }) {
+  const fd = await request.formData();
+  const favorite = fd.get("favorite") === "true";
+  await fetch(`/api/posts/${params.postId}/favorite`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ favorite }),
+  });
+  return null; // default: revalidate matching loaders
+}
+```
+
+✅ Revalidation: automatic and controllable
+
+- After actions or navigations, loaders re-run by default.
+- Control it with `shouldRevalidate` or trigger manually with `useRevalidator`.
+```jsx
+// Only revalidate on non-GET mutations or when search changes
+export const route = {
+  loader: todosLoader,
+  shouldRevalidate: ({ currentUrl, nextUrl, formMethod }) => {
+    if (formMethod && formMethod.toLowerCase() !== "get") return true;
+    return currentUrl.search !== nextUrl.search;
+  },
+};
+
+// Manual revalidation
+import { useRevalidator } from "react-router-dom";
+function RefreshButton() {
+  const { revalidate, state } = useRevalidator();
+  return (
+    <button onClick={() => revalidate()} disabled={state === "loading"}>
+      {state === "loading" ? "Refreshing…" : "Refresh"}
+    </button>
+  );
+}
+```
+
+✅ Route IDs + useRouteLoaderData: share parent data with children
+
+- Give a route an id and read its loader data from any descendant.
+```jsx
+// router
+{
+  id: "root",
+  path: "/",
+  loader: async () => ({ user: await fetch("/api/me").then(r => r.json()) }),
+  element: <RootLayout />,
+  children: [/* ... */],
+}
+
+// anywhere below root:
+import { useRouteLoaderData } from "react-router-dom";
+function UserBadge() {
+  const { user } = useRouteLoaderData("root");
+  return <span>Signed in as {user.name}</span>;
+}
+```
+
+✅ Progressive, lazy-loaded route modules (code-split loaders/actions/components)
+
+- Load a route’s component, loader, and action only when navigated to.
+```jsx
+// route config
+{
+  path: "settings",
+  lazy: () => import("./routes/settings"), // settings.jsx exports loader/action/default
+}
+
+// routes/settings.jsx
+export async function loader() { /* ... */ }
+export async function action() { /* ... */ }
+export default function Settings() { return <h2>Settings</h2>; }
+```
+
+✅ Navigation state and GET forms (URL-driven search)
+
+- useNavigation gives pending state; GET Forms update the URL and loaders respond to query changes.
+```jsx
+import { Form, useLoaderData, useNavigation, useSubmit } from "react-router-dom";
+
+// loader reads query
+export async function loader({ request }) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q") ?? "";
+  const results = await fetch(`/api/search?q=${encodeURIComponent(q)}`).then(r => r.json());
+  return { q, results };
+}
+
+function SearchPage() {
+  const { q, results } = useLoaderData();
+  const nav = useNavigation();
+  const submit = useSubmit();
+
+  return (
+    <>
+      <Form role="search" method="get" onChange={(e) => submit(e.currentTarget)}>
+        <input name="q" defaultValue={q} placeholder="Search…" />
+      </Form>
+      {nav.state === "loading" ? <p>Searching…</p> : <pre>{JSON.stringify(results, null, 2)}</pre>}
+    </>
+  );
+}
+```
+
+
 ✅ Data Loading (v6.4+)
 ```tsx
-<Route
-  path="/products/:id"
-  element={<ProductDetails />}
-  loader={async ({ params }) => {
-    return fetch(`/api/products/${params.id}`);
-  }}
-/>
+import { createBrowserRouter } from "react-router-dom";
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    loader: async () => {
+      // return data from here
+      return { records: await getSomeRecords() };
+    },
+    Component: MyRoute,
+  },
+]);
+```
+
+Accessing Data
+```tsx
+import { useLoaderData } from "react-router-dom";
+
+export function MyRoute() {
+  const data = useLoaderData();
+  return (
+    <div>
+      {data.records.map((record: any) => (
+        <p key={record.id}>{record.name}</p>
+      ))}
+    </div>
+  );
+}
 ```
