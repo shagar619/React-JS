@@ -869,5 +869,73 @@ Maintained by the React Training team, it’s the de-facto standard for routing 
 
 
 
+#### ⚡ Latest Version: react-router-dom v6 (2025)
+
+- Introduced `Routes` replacing `Switch`.
+- Route elements are now passed via `element` prop.
+- Nested routes with `Outlet`.
+- New hooks: `useNavigate`, `useParams`, `useLocation`.
+- Improved route matching algorithm.
+- Removed `withRouter` HOC.
+- Better TypeScript support.
+- Suspense support for data loading.
+
+#### 🛠 Professional Application Setup with React Router (v6+)
+
+**Install React Router**
+```bash
+npm install react-router-dom
+```
+
+**Setup Router in main.tsx**
+```tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+);
+```
+
+**Routing**
+
+`app/routes.tsx`
+```tsx
+import { createBrowserRouter } from "react-router-dom";
+import { Home, About, AuthLayout, Login, Register, ConcertsHome, ConcertDetails } from "../app/pages";
+
+export const router = createBrowserRouter([
+  {
+    path: "/",
+    Component: Root,
+    children: [
+      { index: true, Component: Home },
+      { path: "about", Component: About },
+      {
+        path: "auth",
+        Component: AuthLayout,
+        children: [
+          { path: "login", Component: Login },
+          { path: "register", Component: Register },
+        ],
+      },
+      {
+        path: "concerts",
+        children: [
+          { index: true, Component: ConcertsHome },
+          { path: ":city", Component: ConcertsCity },
+          { path: "trending", Component: ConcertsTrending },
+        ],
+      },
+    ],
+  },
+]);
+```
 
 
