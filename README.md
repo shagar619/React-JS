@@ -187,6 +187,14 @@ Preview locally:
 npm run preview
 ```
 
+## React Architecture
+
+<div>
+
+ <img src="https://i.ibb.co.com/23TRLq0Q/1-8vf-MJjm-H-Z3ux-EP-RGKTBg.png" style="width:100%; height:auto;">
+
+</div>
+
 
 ## Building Blocks of React
 
