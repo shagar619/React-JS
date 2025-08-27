@@ -329,7 +329,7 @@ const element = <h1>Hello, JSX!</h1>;
 ```
 - Allows dynamic rendering based on JS values.
 
-> **Note:** JSX must be transpiled to JavaScript before it can be executed in the browser.
+> **Note:** In general, browsers are not capable of reading JSX and only can read pure JavaScript. The web browsers read JSX with the help of a transpiler. Transpilers are used to convert JSX into JavaScript. The transpiler used is called Babel.
 
 
 ### Props (Properties)
@@ -554,23 +554,19 @@ export default UserProfile;
 
 📌 Example:
 
-```tsx
-import React from 'react';
+```jsx
+import React from "react";
+import ReactDOM from "react-dom/client";  // Import react-dom/client
 
-const TodoList = ({ todos }) => {
-  return (
-    <ul>
-      {todos.map(todo => (
-        <li key={todo.id}>{todo.text}</li>
-      ))}
-    </ul>
-  );
-};
+const numbers = [1, 2, 3, 4, 5];
 
-export default TodoList;
+const updatedNums = numbers.map((number) => {
+    return <li key={number}>{number}</li>;  // Add a unique "key" prop
+});
+
+const root = ReactDOM.createRoot(document.getElementById("root"));  // Create the root
+root.render(<ul>{updatedNums}</ul>);  // Render the list into the root element
 ```
-
-> **Note:** In this example, the `TodoList` component renders a list of todo items. Each item has a unique `key` prop, which is essential for efficient updates and re-renders.
 
 
 ### Lifecycle (Class) / Hooks (Function)
@@ -856,4 +852,22 @@ export default function OrdersTable({ socket }) {
   );
 }
 ```
+
+### 🔹 What is React Router?
+React Router is a popular library for handling routing in React applications. It provides a declarative way to define routes and navigate between different views or pages within an application. React Router is built on top of React and allows developers to create single-page applications with dynamic routing. In a SPA, the browser doesn’t reload for every page → React Router handles navigation by mapping URLs to components.
+Maintained by the React Training team, it’s the de-facto standard for routing in React.
+
+#### Key Features of React Router
+
+- **Declarative Routing:** Define routes using JSX, making the code more readable and maintainable.
+- **Dynamic Routing:** Routes can be added, removed, or changed dynamically based on application state.
+- **Nested Routes:** Support for nested UI and layouts.
+- **Route Parameters:** Capture values from the URL.
+- **Programmatic Navigation:** Navigate using code (e.g., after form submission).
+- **Route Guards:** Protect routes and redirect unauthorized users.
+- **Lazy Loading:** Load route components lazily for better performance.
+
+
+
+
 
