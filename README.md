@@ -747,3 +747,25 @@ function TextInput() {
 ```
 > Used in form inputs, animations, and integrating with third-party DOM libraries.
 
+
+### Higher-Order Components (HOC)
+
+- A function that takes a component and returns a new component.
+- Used for code reuse, logic, and bootstrap abstraction.
+
+📌 Example (Logging Props):
+```tsx
+function withLogging(WrappedComponent) {
+  return function WrappedWithLogging(props) {
+    console.log("Rendering", WrappedComponent.name, "with props", props);
+    return <WrappedComponent {...props} />;
+  };
+}
+
+function MyComponent(props) {
+  return <div>{props.message}</div>;
+}
+
+const MyComponentWithLogging = withLogging(MyComponent);
+```
+
