@@ -1380,3 +1380,25 @@ function User({ id }) {
   return <pre>{JSON.stringify(user, null, 2)}</pre>;
 }
 ```
+
+
+#### 3. useRef
+Manages mutable values that persist across renders without causing re-renders.
+- Returns a mutable ref object with a `.current` property.
+- Commonly used to access DOM elements or store mutable variables.
+
+📌 Example (Professional – Autofocus Input):
+```jsx
+import { useEffect, useRef } from "react";
+
+function LoginForm() {
+  const inputRef = useRef();
+
+  useEffect(() => {
+    inputRef.current.focus(); // focus input on mount
+  }, []);
+
+  return <input ref={inputRef} placeholder="Enter username" />;
+}
+```
+
