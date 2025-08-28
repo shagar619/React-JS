@@ -1293,3 +1293,52 @@ export function MyRoute() {
   );
 }
 ```
+
+
+
+
+## 🔹What are hooks in React?
+
+Hooks are special functions that let you “hook into” React features (like state, lifecycle, context) inside functional components.
+
+- **Before hooks**: only class components had state & lifecycle methods.
+- **After hooks**: functional components can do everything classes can do (and more).
+- **Rules of Hooks**:
+  1. Only call hooks at the top level (not inside loops, conditions, or nested functions).
+  2. Only call hooks from React functions (components or custom hooks).
+
+
+### 🔑 Types of Hooks in React
+
+#### 1. useState
+Manages state in a functional component.
+- Returns a stateful value and a function to update it.
+- Syntax: `const [state, setState] = useState(initialState);`
+
+📌 Example (Counter Button – Professional Dashboard Widget):
+```jsx
+import { useState } from "react";
+
+function Counter({ step = 1 }) {
+  // Lazy init: expensive initial computation runs once
+  const [count, setCount] = useState(() => {
+    // e.g., read from localStorage or compute something heavy
+    return 0;
+  });
+
+  const increment = () => {
+    // Functional update form avoids stale state in async scenarios
+    setCount(c => c + step);
+  };
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={increment}>+{step}</button>
+      <button onClick={() => setCount(0)}>Reset</button>
+    </div>
+  );
+}
+export default Counter;
+```
+
