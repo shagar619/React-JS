@@ -1581,3 +1581,22 @@ function Measure() {
 }
 ```
 
+#### 9. useId
+Generates unique IDs for accessibility and server rendering.
+- Ensures consistent IDs across server and client.
+- Useful for linking labels and inputs.
+
+📌 Example (Accessible Input):
+```jsx
+import { useId } from "react";
+
+function Input() {
+  const id = useId();
+  return (
+    <>
+      <label htmlFor={id}>Name:</label>
+      <input id={id} type="text" />
+    </>
+  );
+}
+```
