@@ -1600,3 +1600,42 @@ function Input() {
   );
 }
 ```
+
+
+#### 10. useTransition and useDeferredValue
+- Helps manage concurrent rendering.
+- useTransition: Defers state updates to keep UI responsive.
+- useDeferredValue: Defers re-rendering non-urgent parts.
+
+📌 Example (Deferred Search Input):
+```jsx
+import { useState, useTransition, useDeferredValue } from "react";
+
+function Search() {
+  const [text, setText] = useState("");
+  const [isPending, startTransition] = useTransition();
+  const deferredText = useDeferredValue(text);
+
+  const handleChange = (e) => {
+    const nextText = e.target.value;
+    startTransition(() => {
+      setText(nextText);
+    });
+  };
+
+  const results = useMemo(() => {
+    // simulate expensive search
+    return deferredText ? ["Result 1", "Result 2"] : [];
+  }, [deferredText]);
+
+  return (
+    <>
+      <input type="text" onChange={handleChange} />
+      {isPending && <div>Loading...</div>}
+      <ul>
+        {results.map(r => <li key={r}>{r}</li>)}
+      </ul>
+    </>
+  );
+}
+```
