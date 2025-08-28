@@ -1553,3 +1553,31 @@ function Parent() {
 }
 ```
 
+#### 8. useLayoutEffect
+Synchronously fires after all DOM mutations.
+- Useful for reading layout from the DOM and synchronously re-rendering.
+- Blocks browser painting until the effect is run.
+
+📌 Example (Measure DOM Element):
+```jsx
+import { useLayoutEffect, useRef, useState } from "react";
+
+function Measure() {
+  const ref = useRef(null);
+  const [rect, setRect] = useState(null);
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      setRect(ref.current.getBoundingClientRect());
+    }
+  });
+
+  return (
+    <>
+      <div ref={ref}>Measure me</div>
+      {rect && <pre>{JSON.stringify(rect, null, 2)}</pre>}
+    </>
+  );
+}
+```
+
