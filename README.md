@@ -1402,3 +1402,42 @@ function LoginForm() {
 }
 ```
 
+
+#### 4. useContext
+
+Allows you to access and share global data (like themes, user info) without prop drilling.
+- Accepts a context object and returns the current context value.
+- Components re-render when the context value changes.
+
+📌 Example (Professional – Dark Mode Toggle):
+```jsx
+import { createContext, useContext, useState } from "react";
+
+const ThemeContext = createContext();
+
+function App() {
+  const [theme, setTheme] = useState("light");
+
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      <Navbar />
+    </ThemeContext.Provider>
+  );
+}
+
+function Navbar() {
+  const { theme, setTheme } = useContext(ThemeContext);
+
+  return (
+    <nav className={theme}>
+      <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}>
+        Toggle Theme
+      </button>
+    </nav>
+  );
+}
+```
+
+
+
+
