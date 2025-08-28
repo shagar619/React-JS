@@ -1441,3 +1441,54 @@ function Navbar() {
 
 
 
+#### 5. useReducer
+An alternative to `useState` for complex state logic.
+- Accepts a reducer function and initial state.
+- Returns the current state and a dispatch function.
+
+📌 Example (ToDo App with Reducer):
+```jsx
+import { useReducer } from "react";
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return [...state, { id: crypto.randomUUID(), text: action.text, done: false }];
+    case "toggle":
+      return state.map(t => t.id === action.id ? { ...t, done: !t.done } : t);
+    case "remove":
+      return state.filter(t => t.id !== action.id);
+    default:
+      return state;
+  }
+}
+
+function TodoApp() {
+  const [todos, dispatch] = useReducer(reducer, []);
+
+  return (
+    <>
+      <button onClick={() => dispatch({ type: "add", text: "Learn Hooks" })}>
+        Add
+      </button>
+      <ul>
+        {todos.map(t => (
+          <li key={t.id}>
+            <label>
+              <input
+                type="checkbox"
+                checked={t.done}
+                onChange={() => dispatch({ type: "toggle", id: t.id })}
+              />
+              {t.text}
+            </label>
+            <button onClick={() => dispatch({ type: "remove", id: t.id })}>
+              ✕
+            </button>
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+```
