@@ -1492,3 +1492,32 @@ function TodoApp() {
   );
 }
 ```
+
+
+#### 6. useMemo
+Optimizes performance by memoizing expensive calculations.
+- Accepts a function and dependency array.
+- Recomputes the memoized value only when dependencies change.
+
+📌 Example (Expensive Calculation):
+```jsx
+import { useMemo, useState } from "react";
+
+function Fibonacci({ n }) {
+  const [highlight, setHighlight] = useState(false);
+
+  const value = useMemo(() => {
+    function fib(x) {
+      return x <= 1 ? x : fib(x - 1) + fib(x - 2);
+    }
+    return fib(n); // expensive
+  }, [n]);
+
+  return (
+    <div style={{ background: highlight ? "#fffae6" : "white" }}>
+      Fib({n}) = {value}
+      <button onClick={() => setHighlight(h => !h)}>Toggle highlight</button>
+    </div>
+  );
+}
+```
