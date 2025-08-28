@@ -1757,3 +1757,25 @@ export default function Root() {
 }
 ```
 
+#### Custom Hook
+
+📌 Example
+```jsx
+import { useState, useEffect } from "react";
+
+function useFetch(url) {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch(url).then(res => res.json()).then(setData);
+  }, [url]);
+
+  return data;
+}
+
+// Usage
+function Users() {
+  const users = useFetch("/api/users");
+  return <ul>{users?.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
+}
+```
