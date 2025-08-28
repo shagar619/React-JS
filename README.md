@@ -1342,3 +1342,41 @@ function Counter({ step = 1 }) {
 export default Counter;
 ```
 
+#### 2. useEffect
+
+Handles side effects (fetching data, subscriptions, DOM updates).
+It’s the replacement for lifecycle methods `(componentDidMount`, `componentDidUpdate`, `componentWillUnmount`).
+- Syntax: `useEffect(() => { /* effect */ return () => { /* cleanup */ }; }, [dependencies]);`
+
+📌 Example (Fetch Users from API):
+```jsx
+import { useEffect, useState } from "react";
+
+function User({ id }) {
+  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState("idle");
+
+  useEffect(() => {
+    const ctrl = new AbortController();
+    setStatus("loading");
+
+    fetch(`/api/users/${id}`, { signal: ctrl.signal })
+      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then(data => {
+        setUser(data);
+        setStatus("success");
+      })
+      .catch(err => {
+        if (err.name !== "AbortError") {
+          setStatus("error");
+        }
+      });
+
+    return () => ctrl.abort(); // cancel pending fetch on id change/unmount
+  }, [id]);
+
+  if (status === "loading") return <p>Loading…</p>;
+  if (status === "error") return <p>Something went wrong.</p>;
+  return <pre>{JSON.stringify(user, null, 2)}</pre>;
+}
+```
