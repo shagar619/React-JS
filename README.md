@@ -1521,3 +1521,35 @@ function Fibonacci({ n }) {
   );
 }
 ```
+
+
+#### 7. useCallback
+Optimizes performance by memoizing function references.
+- Accepts a function and dependency array.
+- Recomputes the memoized function only when dependencies change.
+
+📌 Example (Button with Memoized Click Handler):
+```jsx
+import { memo, useCallback, useState } from "react";
+
+const Child = memo(function Child({ onAdd }) {
+  console.log("Child re-render");
+  return <button onClick={() => onAdd(1)}>Add 1</button>;
+});
+
+function Parent() {
+  const [count, setCount] = useState(0);
+
+  const handleAdd = useCallback((n) => {
+    setCount(c => c + n);
+  }, []); // stable reference
+
+  return (
+    <>
+      <p>Count: {count}</p>
+      <Child onAdd={handleAdd} />
+    </>
+  );
+}
+```
+
