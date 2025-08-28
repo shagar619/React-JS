@@ -1639,3 +1639,121 @@ function Search() {
   );
 }
 ```
+
+
+### “All-In-One” example
+```jsx
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useTransition,
+  createContext
+} from "react";
+
+// Context + reducer
+const TodosContext = createContext();
+
+function todosReducer(state, action) {
+  switch (action.type) {
+    case "add":
+      return [...state, { id: crypto.randomUUID(), text: action.text, done: false }];
+    case "toggle":
+      return state.map(t => t.id === action.id ? { ...t, done: !t.done } : t);
+    default:
+      return state;
+  }
+}
+
+function TodosProvider({ children }) {
+  const [todos, dispatch] = useReducer(todosReducer, []);
+  const value = useMemo(() => ({ todos, dispatch }), [todos]);
+  return <TodosContext.Provider value={value}>{children}</TodosContext.Provider>;
+}
+
+const TodoItem = memo(function TodoItem({ todo, onToggle }) {
+  return (
+    <li>
+      <label>
+        <input type="checkbox" checked={todo.done} onChange={() => onToggle(todo.id)} />
+        {todo.text}
+      </label>
+    </li>
+  );
+});
+
+function App() {
+  const { todos, dispatch } = useContext(TodosContext);
+  const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const [isPending, startTransition] = useTransition();
+  const inputId = useId();
+  const inputRef = useRef(null);
+
+  const addTodo = useCallback((text) => {
+    dispatch({ type: "add", text });
+  }, [dispatch]);
+
+  const onToggle = useCallback((id) => {
+    dispatch({ type: "toggle", id });
+  }, [dispatch]);
+
+  const filtered = useMemo(() => {
+    return todos.filter(t => t.text.toLowerCase().includes(deferredQuery.toLowerCase()));
+  }, [todos, deferredQuery]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  function onAdd() {
+    const text = inputRef.current.value.trim();
+    if (!text) return;
+    startTransition(() => addTodo(text)); // non-urgent update
+    inputRef.current.value = "";
+    setQuery("");
+  }
+
+  return (
+    <div>
+      <div>
+        <label htmlFor={inputId}>New todo</label>
+        <input id={inputId} ref={inputRef} />
+        <button onClick={onAdd}>Add</button>
+      </div>
+
+      <div>
+        <input
+          placeholder="Filter…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {isPending && <span> Updating…</span>}
+      </div>
+
+      <ul>
+        {filtered.map(t => (
+          <TodoItem key={t.id} todo={t} onToggle={onToggle} />
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+// Usage
+export default function Root() {
+  return (
+    <TodosProvider>
+      <App />
+    </TodosProvider>
+  );
+}
+```
+
