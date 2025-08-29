@@ -1974,3 +1974,56 @@ function ThemeHolder() {
 }
 ```
 
+**7. External store + useSyncExternalStore (built-in)**
+
+```tsx
+const store = {
+  state: { theme: 'light' },
+  listeners: new Set(),
+  toggleTheme() {
+    this.state.theme = this.state.theme === 'light' ? 'dark' : 'light';
+    this.listeners.forEach((listener) => listener());
+  },
+  subscribe(listener) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  },
+  getSnapshot() {
+    return this.state.theme;
+  },
+};
+
+function useTheme() {
+  return React.useSyncExternalStore(
+    store.subscribe.bind(store),
+    store.getSnapshot.bind(store)
+  );
+}
+
+function ThemeToggle() {
+  const theme = useTheme();
+  return <button onClick={() => store.toggleTheme()}>Theme: {theme}</button>;
+}
+```
+
+**8. Co-locate or lift state “just enough”**
+
+This approach involves placing state as close as possible to where it's needed, or lifting it just enough to share between components, minimizing prop drilling.
+
+```tsx
+// Before (drilling theme + setter)
+function App() {
+  const [theme, setTheme] = React.useState('light');
+  return <Parent theme={theme} setTheme={setTheme} />;
+}
+function Parent(props) { return <Middle {...props} />; }
+function Middle(props) { return <Leaf {...props} />; }
+function Leaf({ theme, setTheme }) { /* ... */ }
+
+// After (co-located in Leaf)
+function Parent() { return <Leaf />; }
+function Leaf() {
+  const [theme, setTheme] = React.useState('light');
+  return <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}>{theme}</button>;
+}
+```
