@@ -1910,3 +1910,20 @@ function UserName() {
 }
 ```
 
+
+**4. Router/URL state (React Router)**
+
+React Router allows you to store state in the URL, which components can read directly, avoiding prop drilling.
+
+```tsx
+function Leaf() {
+  const [params, setParams] = useSearchParams();
+  const theme = params.get('theme') ?? 'light';
+  const toggle = () => setParams({ theme: theme === 'light' ? 'dark' : 'light' });
+  return <button onClick={toggle}>Theme: {theme}</button>;
+}
+```
+
+
+
+
