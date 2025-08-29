@@ -1853,20 +1853,42 @@ function App() {
   );
 }
 
-function Dashboard() {
-  return <Sidebar />;
-}
-
-function Sidebar() {
-  return <UserProfile />;
-}
-
-function UserProfile() {
-  return <UserName />;
-}
-
 function UserName() {
   const user = React.useContext(UserContext);
   return <div>{user.name}</div>;
+}
+```
+
+**2. State management libraries (Redux, Zustand, MobX, Jotai, Recoil)**
+
+These libraries provide more powerful and scalable solutions for managing global state, avoiding prop drilling by connecting components directly to the state they need.
+
+```tsx
+// Redux example
+import { createStore } from "redux";
+import { Provider, useSelector, useDispatch } from "react-redux";
+
+const initialState = { user: { name: "John Doe" } };
+
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    default:
+      return state;
+  }
+}
+
+const store = createStore(reducer);
+
+function UserName() {
+  const user = useSelector(state => state.user);
+  return <div>{user.name}</div>;
+}
+
+function App() {
+  return (
+    <Provider store={store}>
+      <UserName />
+    </Provider>
+  );
 }
 ```
