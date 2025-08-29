@@ -1779,3 +1779,41 @@ function Users() {
   return <ul>{users?.map(u => <li key={u.id}>{u.name}</li>)}</ul>;
 }
 ```
+
+
+## 🔹What is Prop Drilling in React?
+
+Prop Drilling in React refers to the process where you pass data from a parent component to a deeply nested child component through multiple layers of intermediate components that do not need the data themselves. This can make the code harder to maintain and understand.
+
+📌 Example of Prop Drilling:
+Imagine you have an app with this component tree:
+
+```nginx
+App → Dashboard → Sidebar → UserProfile → UserName
+```
+
+Suppose the `App` component has user data (`name: "John Doe"`) that you need to display inside `UserName`.
+
+Without Context (Prop Drilling):
+```tsx
+function App() {
+  const user = { name: "John Doe" };
+  return <Dashboard user={user} />;
+}
+
+function Dashboard({ user }) {
+  return <Sidebar user={user} />;
+}
+
+function Sidebar({ user }) {
+  return <UserProfile user={user} />;
+}
+
+function UserProfile({ user }) {
+  return <UserName user={user} />;
+}
+
+function UserName({ user }) {
+  return <div>{user.name}</div>;
+}
+```
