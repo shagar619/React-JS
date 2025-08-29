@@ -1785,7 +1785,7 @@ function Users() {
 
 Prop Drilling in React refers to the process where you pass data from a parent component to a deeply nested child component through multiple layers of intermediate components that do not need the data themselves. This can make the code harder to maintain and understand.
 
-📌 Example of Prop Drilling:
+#### 📌 Example of Prop Drilling:
 Imagine you have an app with this component tree:
 
 ```nginx
@@ -1824,11 +1824,9 @@ function UserName({ user }) {
   - Components (`Dashboard`, `Sidebar`, `UserProfile`) get props they don’t use.
 
 **2. Code Becomes Hard to Maintain**
-
   - If you add/remove props, you must update every intermediate component.
 
 **3. Reduced Readability**
-
   - It’s harder to understand which component actually uses the prop.
 
 **4. Scalability Issues**
@@ -1836,3 +1834,39 @@ function UserName({ user }) {
 
 **5. Performance Overhead**
   - Any prop change causes all intermediate components to re-render, even if they don’t use the data.
+
+
+#### ✅ Solutions to Prop Drilling
+
+**1. React Context API (built-in)**
+
+Instead of drilling props, we can wrap components in a context provider and access data with useContext.
+```tsx
+const UserContext = React.createContext();
+
+function App() {
+  const user = { name: "John Doe" };
+  return (
+    <UserContext.Provider value={user}>
+      <Dashboard />
+    </UserContext.Provider>
+  );
+}
+
+function Dashboard() {
+  return <Sidebar />;
+}
+
+function Sidebar() {
+  return <UserProfile />;
+}
+
+function UserProfile() {
+  return <UserName />;
+}
+
+function UserName() {
+  const user = React.useContext(UserContext);
+  return <div>{user.name}</div>;
+}
+```
