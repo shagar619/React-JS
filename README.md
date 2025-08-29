@@ -1925,5 +1925,52 @@ function Leaf() {
 ```
 
 
+**5. Composition patterns (avoid passing through intermediates)**
 
+Instead of passing props through many layers, use composition to directly provide the needed data to the component.
+
+```tsx
+function App() {
+  const user = { name: "John Doe" };
+  return (
+    <Dashboard>
+      <UserName user={user} />
+    </Dashboard>
+  );
+}
+
+function Dashboard({ children }) {
+  return <div className="dashboard">{children}</div>;
+}
+
+function UserName({ user }) {
+  return <div>{user.name}</div>;
+}
+```
+
+**6. Pub/Sub (event bus)**
+
+This pattern uses an event bus to publish and subscribe to events, allowing components to communicate without direct prop passing.
+
+```tsx
+const bus = (() => {
+  const listeners = new Map();
+  return {
+    on: (type, fn) => (listeners.set(type, [...(listeners.get(type) || []), fn]), () => {
+      listeners.set(type, (listeners.get(type) || []).filter(f => f !== fn));
+    }),
+    emit: (type, payload) => (listeners.get(type) || []).forEach(fn => fn(payload)),
+  };
+})();
+
+function DeepToggleButton() {
+  return <button onClick={() => bus.emit('theme/toggle')}>Toggle theme</button>;
+}
+
+function ThemeHolder() {
+  const [theme, setTheme] = React.useState('light');
+  React.useEffect(() => bus.on('theme/toggle', () => setTheme(t => t === 'light' ? 'dark' : 'light')), []);
+  return <div>Theme: {theme}</div>;
+}
+```
 
