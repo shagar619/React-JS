@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD012 MD026 MD001 MD022 MD032 MD029 MD019 MD034 MD031 MD047 MD040 MD009 MD058 MD024 MD033 MD041 MD045 MD036  -->
+<!-- markdownlint-disable MD012 MD026 MD001 MD022 MD032 MD029 MD019 MD034 MD031 MD047 MD040 MD009 MD058 MD024 MD033 MD041 MD045 MD036 MD007  -->
 
 <div>
 
@@ -1817,3 +1817,22 @@ function UserName({ user }) {
   return <div>{user.name}</div>;
 }
 ```
+
+**⚠️ Disadvantages of Prop Drilling**
+
+**1. Unnecessary Passing of Data**
+  - Components (`Dashboard`, `Sidebar`, `UserProfile`) get props they don’t use.
+
+**2. Code Becomes Hard to Maintain**
+
+  - If you add/remove props, you must update every intermediate component.
+
+**3. Reduced Readability**
+
+  - It’s harder to understand which component actually uses the prop.
+
+**4. Scalability Issues**
+  - As the app grows (more nested components), prop drilling becomes unmanageable.
+
+**5. Performance Overhead**
+  - Any prop change causes all intermediate components to re-render, even if they don’t use the data.
