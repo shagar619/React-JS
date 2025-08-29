@@ -2027,3 +2027,9 @@ function Leaf() {
   return <button onClick={() => setTheme(t => t === 'light' ? 'dark' : 'light')}>{theme}</button>;
 }
 ```
+
+**Notes:**
+
+- Small apps or shallow trees: prefer co-location, composition, or Context.
+- Large apps/shared state across unrelated parts: use a store (Redux/Zustand) or data cache (React Query/SWR).
+- If you need to avoid threading callbacks: pub/sub or a store for actions works well.
