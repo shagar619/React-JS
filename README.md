@@ -1892,3 +1892,21 @@ function App() {
   );
 }
 ```
+
+**3. Data fetching caches (React Query/SWR/Apollo)**
+
+These libraries provide built-in caching and state management for server state, reducing the need for prop drilling.
+
+```tsx
+import { useQuery } from "react-query";
+
+function fetchUser() {
+  return fetch("/api/user").then(res => res.json());
+}
+
+function UserName() {
+  const { data: user } = useQuery("user", fetchUser);
+  return <div>{user?.name}</div>;
+}
+```
+
