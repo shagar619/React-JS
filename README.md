@@ -2052,3 +2052,148 @@ Examples by control type:
 - Textarea: `onChange`, `value`.
 - Button: `onClick`.
 - Other form elements follow similar patterns.
+
+#### 🏗 All-in-One Controlled Form Example:
+
+```jsx
+import { useState } from "react";
+
+function AllInOneForm() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "user",
+    gender: "",
+    terms: false,
+    bio: "",
+  });
+
+  // Handles input change for all fields
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm({
+      ...form,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("✅ Form Submitted:", form);
+    alert(`Form Submitted:\n${JSON.stringify(form, null, 2)}`);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} style={{ maxWidth: "400px", margin: "auto" }}>
+      <h2>All-in-One Controlled Form</h2>
+
+      {/* Text Input */}
+      <label>
+        Name:
+        <input
+          type="text"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      {/* Email Input */}
+      <label>
+        Email:
+        <input
+          type="email"
+          name="email"
+          value={form.email}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      {/* Password Input */}
+      <label>
+        Password:
+        <input
+          type="password"
+          name="password"
+          value={form.password}
+          onChange={handleChange}
+          required
+        />
+      </label>
+      <br />
+
+      {/* Select Dropdown */}
+      <label>
+        Role:
+        <select name="role" value={form.role} onChange={handleChange}>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+          <option value="moderator">Moderator</option>
+        </select>
+      </label>
+      <br />
+
+      {/* Radio Buttons */}
+      <div>
+        Gender:
+        <label>
+          <input
+            type="radio"
+            name="gender"
+            value="male"
+            checked={form.gender === "male"}
+            onChange={handleChange}
+          />
+          Male
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="gender"
+            value="female"
+            checked={form.gender === "female"}
+            onChange={handleChange}
+          />
+          Female
+        </label>
+      </div>
+
+      {/* Checkbox */}
+      <label>
+        <input
+          type="checkbox"
+          name="terms"
+          checked={form.terms}
+          onChange={handleChange}
+        />
+        Accept Terms & Conditions
+      </label>
+      <br />
+
+      {/* Textarea */}
+      <label>
+        Bio:
+        <textarea
+          name="bio"
+          value={form.bio}
+          onChange={handleChange}
+          rows="4"
+          placeholder="Tell us about yourself..."
+        />
+      </label>
+      <br />
+
+      <button type="submit" disabled={!form.terms}>
+        Submit
+      </button>
+    </form>
+  );
+}
+
+export default AllInOneForm;
+```
