@@ -2033,3 +2033,22 @@ function Leaf() {
 - Small apps or shallow trees: prefer co-location, composition, or Context.
 - Large apps/shared state across unrelated parts: use a store (Redux/Zustand) or data cache (React Query/SWR).
 - If you need to avoid threading callbacks: pub/sub or a store for actions works well.
+
+
+## 🔹What are controlled components in React?
+
+- A React component that controls the input form elements, maintaining their state within the component.
+- The component's state is the "single source of truth" for the input values.
+- Changes to the input are handled through event handlers that update the state.
+- This allows validation, conditionally enabling/disabling buttons, and enforcing input formats.
+
+Examples by control type:
+- Text input: `onChange`, `value`.
+- Checkbox: `onChange`, `checked`.
+- Radio button: `onChange`, `checked`.
+- Select: `onChange`, `value`.
+- File input: `onChange`, `files`.
+- Range input: `onChange`, `value`.
+- Textarea: `onChange`, `value`.
+- Button: `onClick`.
+- Other form elements follow similar patterns.
