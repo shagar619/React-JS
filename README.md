@@ -2294,3 +2294,67 @@ app.post("/api/users", (req, res) => res.status(201).json(req.body));
 
 app.listen(5000, () => console.log("API running on port 5000"));
 ```
+
+**2. Using a Proxy in React (Development Only)**
+
+React’s development server can proxy API requests to bypass CORS in local dev.
+
+Add this to `package.json`:
+```json
+{
+  "proxy": "http://localhost:5000"
+}
+```
+
+Call fetch("/api/users") from React; CRA forwards to 5000 and keeps same origin.
+- Vite (`vite.config.js`)
+```javascript
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      '/api': 'http://localhost:5000',
+    },
+  },
+});
+```
+
+- Next.js (`next.config.js` rewrites)
+```javascriptmodule.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:5000/api/:path*', // Proxy to Backend
+      },
+    ];
+  },
+};
+```
+
+#### 3. NGINX reverse proxy (production)
+
+Make your frontend and API appear same-origin:
+```nginx
+server {
+  listen 80;
+  server_name myapp.com;
+
+  location / {
+    root /path/to/your/react/app;
+    try_files $uri /index.html;
+  }
+
+  location /api/ {
+    proxy_pass http://localhost:5000/api/;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection 'upgrade';
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+  }
+}
+```
