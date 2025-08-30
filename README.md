@@ -2209,4 +2209,23 @@ export default AllInOneForm;
     - `http://localhost:3000` (React app)
     - `https://api.example.com:443` (API server)
 
-👉 By default, a React app running at `http://localhost:3000` cannot call `https://api.example.com` unless the API server allows cross-origin requests.
+- Browsers block JS from calling a different origin (scheme+host+port) unless the server explicitly allows it via CORS headers.
+- For many cross-origin requests, the browser first sends a preflight OPTIONS request to ask permission. If the server replies with the right headers, the actual request proceeds.
+- CORS is enforced by the browser, not React. You fix it on the server (or via a proxy), not in React.
+
+👉 Typical error you’ll see
+
+“Access to fetch at `https://api.example.com` from origin `http://localhost:5173` has been blocked by CORS policy: No ‘Access-Control-Allow-Origin’ header is present…”
+
+
+When does a preflight happen?
+
+Methods other than GET/HEAD/POST
+- Custom headers (e.g., Authorization, X-*)
+- Content-Type is not one of: text/plain, application/x-www-form-urlencoded, multipart/form-data
+- Using credentials (cookies) cross-site also has extra rules
+
+Core CORS headers (cheat sheet)
+
+- **Request**: Origin, Access-Control-Request-Method, Access-Control-Request-Headers
+- **Response**: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Allow-Credentials, Access-Control-Expose-Headers, Access-Control-Max-Age, Vary: Origin
