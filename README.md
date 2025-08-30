@@ -773,7 +773,7 @@ function MyComponent(props) {
 const MyComponentWithLogging = withLogging(MyComponent);
 ```
 
-### 🔹What is virtual DOM in React?
+## 🔹What is virtual DOM in React?
 
 The Virtual DOM is a lightweight, in-memory tree (plain JS objects) that describes what the UI should look like. When props/state change, React re-renders components to produce a new VDOM tree, diffs it against the previous one (“reconciliation”), computes the minimal set of real DOM mutations, and commits those updates to the browser DOM.
 
@@ -853,7 +853,7 @@ export default function OrdersTable({ socket }) {
 }
 ```
 
-### 🔹 What is React Router?
+## 🔹 What is React Router?
 React Router is a popular library for handling routing in React applications. It provides a declarative way to define routes and navigate between different views or pages within an application. React Router is built on top of React and allows developers to create single-page applications with dynamic routing. In a SPA, the browser doesn’t reload for every page → React Router handles navigation by mapping URLs to components.
 Maintained by the React Training team, it’s the de-facto standard for routing in React.
 
@@ -2197,3 +2197,16 @@ function AllInOneForm() {
 
 export default AllInOneForm;
 ```
+
+
+## 🔹Explain CORS in React?
+
+**CORS (Cross-Origin Resource Sharing)** is a security mechanism implemented by browsers to restrict web pages from making requests to a different domain (origin) unless the server explicitly allows it.
+
+- An origin = `protocol + domain + port`
+  Example:
+
+    - `http://localhost:3000` (React app)
+    - `https://api.example.com:443` (API server)
+
+👉 By default, a React app running at `http://localhost:3000` cannot call `https://api.example.com` unless the API server allows cross-origin requests.
