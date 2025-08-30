@@ -2416,3 +2416,61 @@ axios.get("/api/users")
   .then((response) => console.log(response.data))
   .catch((error) => console.error("Error:", error));
 ```
+
+2️⃣ Using Fetch API with CORS
+
+✅ Basic Fetch Request
+```javascript
+import { useEffect, useState } from "react";
+
+function FetchExample() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    fetch("https://api.example.com/data", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // include cookies/auth tokens
+      mode: "cors",           // default, but explicit is clearer
+    })
+      .then((res) => res.json())
+      .then((data) => setData(data))
+      .catch((err) => console.error("CORS error:", err));
+  }, []);
+
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
+
+export default FetchExample;
+```
+
+- Server must respond with:
+```http
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+```
+
+
+
+**✅ Fetch + Proxy (Development Trick)**
+
+If your backend runs at `http://localhost:5000` and frontend at `http://localhost:3000`:
+
+- Add in `package.json` of React app:
+```json
+{
+  "proxy": "http://localhost:5000"
+}
+```
+
+- Then in React code:
+```javascript
+fetch("/api/users")
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
