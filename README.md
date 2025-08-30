@@ -2358,3 +2358,61 @@ server {
   }
 }
 ```
+
+👉 React calls `/api/data` → Nginx forwards to backend → no CORS needed.
+
+
+
+#### 1️⃣ Using Axios with CORS
+
+✅ Basic Axios Request
+```javascript
+import axios from "axios";
+import { useEffect, useState } from "react";
+
+function AxiosExample() {
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    axios
+      .get("https://api.example.com/data", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true, // required if API uses cookies/auth
+      })
+      .then((res) => setData(res.data))
+      .catch((err) => console.error("CORS error:", err));
+  }, []);
+
+  return <pre>{JSON.stringify(data, null, 2)}</pre>;
+}
+
+export default AxiosExample;
+```
+
+- Server must respond with:
+```http
+Access-Control-Allow-Origin: http://localhost:5173
+Access-Control-Allow-Credentials: true
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+```
+
+**✅ Axios + Proxy (Development Trick)**
+
+If your backend runs at `http://localhost:5000` and frontend at `http://localhost:3000`:
+
+- Add in `package.json` of React app:
+```json
+{
+  "proxy": "http://localhost:5000"
+}
+```
+
+- Then in React code:
+```javascript
+axios.get("/api/users")
+  .then((response) => console.log(response.data))
+  .catch((error) => console.error("Error:", error));
+```
