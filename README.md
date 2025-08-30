@@ -2230,9 +2230,9 @@ Core CORS headers (cheat sheet)
 - **Request**: Origin, Access-Control-Request-Method, Access-Control-Request-Headers
 - **Response**: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Allow-Credentials, Access-Control-Expose-Headers, Access-Control-Max-Age, Vary: Origin
 
-React-side request examples
+#### ⚠️ Example of CORS Error in React Side
 
-1. Simple GET (no credentials)
+**1. Simple GET (no credentials)**
 
 ```javascript
 fetch("https://api.example.com/data")
@@ -2241,7 +2241,7 @@ fetch("https://api.example.com/data")
   .catch((error) => console.error("Error:", error));
 ```
 
-2. POST with JSON body
+**2. POST with JSON body**
 
 ```javascript
 fetch("https://api.example.com/data", {
@@ -2256,7 +2256,7 @@ fetch("https://api.example.com/data", {
   .catch((error) => console.error("Error:", error));
 ```
 
-3. Sending credentials (cookies)
+**3. Sending credentials (cookies)**
 
 ```javascript
 fetch("https://api.example.com/data", {
@@ -2267,3 +2267,30 @@ fetch("https://api.example.com/data", {
   .catch((error) => console.error("Error:", error));
 ```
 
+
+#### ✅ How to Fix CORS in React Side
+
+**1. Enable CORS on the Server (Best Practice)**
+
+CORS must be allowed by the API server, not React.
+Example (Node.js + Express backend):
+```javascript
+import express from "express";
+import cors from "cors";
+
+const app = express();
+app.use(express.json());
+
+app.use(cors({
+  origin: ["http://localhost:5173"], // your React dev origin
+  credentials: true, // if you need cookies
+  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+}));
+
+app.get("/api/users", (req, res) => res.json([{ id: 1, name: "Ada" }]));
+
+app.post("/api/users", (req, res) => res.status(201).json(req.body));
+
+app.listen(5000, () => console.log("API running on port 5000"));
+```
