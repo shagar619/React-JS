@@ -2229,3 +2229,41 @@ Core CORS headers (cheat sheet)
 
 - **Request**: Origin, Access-Control-Request-Method, Access-Control-Request-Headers
 - **Response**: Access-Control-Allow-Origin, Access-Control-Allow-Methods, Access-Control-Allow-Headers, Access-Control-Allow-Credentials, Access-Control-Expose-Headers, Access-Control-Max-Age, Vary: Origin
+
+React-side request examples
+
+1. Simple GET (no credentials)
+
+```javascript
+fetch("https://api.example.com/data")
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
+
+2. POST with JSON body
+
+```javascript
+fetch("https://api.example.com/data", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ key: "value" }),
+})
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
+
+3. Sending credentials (cookies)
+
+```javascript
+fetch("https://api.example.com/data", {
+  credentials: "include", // or "same-origin"
+})
+  .then((response) => response.json())
+  .then((data) => console.log(data))
+  .catch((error) => console.error("Error:", error));
+```
+
