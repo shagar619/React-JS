@@ -2843,3 +2843,22 @@ export default function FileUploader() {
   );
 }
 ```
+
+**C) File download (e.g., PDF)**
+```javascript
+import { api } from '../api/axiosClient';
+
+export async function downloadReport(id) {
+  const res = await api.get(`/reports/${id}`, { responseType: 'blob' });
+  const blob = new Blob([res.data], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `report-${id}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+```
+
