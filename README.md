@@ -2863,9 +2863,15 @@ export async function downloadReport(id) {
 ```
 
 **D) Concurrency: load several resources in parallel**
-
 ```javascript
 const [users, posts] = await Promise.all([api.get('/users'), api.get('/posts')]);
 setUsers(users.data);
 setPosts(posts.data);
+```
+
+**E) Timeouts and quick aborts**
+```javascript
+// Already set a global timeout in axiosClient (e.g., 10s).
+// For special cases, override per request:
+api.get('/slow', { timeout: 3000 }).catch((e) => console.log('Timed out', e.code));
 ```
