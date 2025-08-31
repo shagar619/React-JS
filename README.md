@@ -2675,3 +2675,102 @@ export default function UsersList() {
   // render...
 }
 ```
+
+**Interceptors for auth and error handling**
+
+Attach a JWT to every request:
+```javascript
+// src/api/axiosClient.js (continued)
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('accessToken');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+```
+
+```javascript
+// src/api/axiosClient.js (continued)
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const config = error.config;
+    const shouldRetry =
+      (!error.response || error.response.status >= 500) &&
+      (config.__retryCount || 0) < 3;
+
+    if (shouldRetry) {
+      config.__retryCount = (config.__retryCount || 0) + 1;
+      const delay = 200 * 2 ** config.__retryCount; // 200ms, 400ms, 800ms
+      await new Promise((r) => setTimeout(r, delay));
+      return api(config);
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+**Refresh token flow (sketch)**
+
+- When a 401 is returned, call a refresh endpoint, update the token, and retry original requests.
+- Handle concurrency to avoid multiple refresh calls.
+
+```javascript
+// src/api/axiosClient.js (sketch)
+let isRefreshing = false;
+let queue = [];
+
+const runQueue = (err, token) => {
+  queue.forEach(({ resolve, reject }) => (token ? resolve(token) : reject(err)));
+  queue = [];
+};
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          queue.push({
+            resolve: (token) => {
+              original.headers.Authorization = `Bearer ${token}`;
+              resolve(api(original));
+            },
+            reject,
+          });
+        });
+      }
+
+      isRefreshing = true;
+      try {
+        const refreshToken = localStorage.getItem('refreshToken');
+        const { data } = await axios.post(
+          '/auth/refresh',
+          { refreshToken },
+          { baseURL: api.defaults.baseURL }
+        );
+        localStorage.setItem('accessToken', data.accessToken);
+        api.defaults.headers.common.Authorization = `Bearer ${data.accessToken}`;
+        runQueue(null, data.accessToken);
+        return api(original);
+      } catch (err) {
+        runQueue(err, null);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        // e.g., redirect to login
+        // window.location.href = '/login';
+        return Promise.reject(err);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
