@@ -2474,3 +2474,204 @@ fetch("/api/users")
   .then((data) => console.log(data))
   .catch((error) => console.error("Error:", error));
 ```
+
+
+
+## 🔹What is axios and how to use it in React?
+
+Axios is a popular JavaScript library used to make HTTP requests (GET, POST, PUT, DELETE) from node.js or XML Http Requests from the browser and it supports the Promise API that is native to JS ES6+. It is often used in React applications to communicate with backend services or APIs.
+
+- Axios is a promise-based HTTP client for browsers and Node.js.
+- It simplifies HTTP requests compared to fetch by offering:
+  - Automatic JSON parsing/stringifying
+  - Global config (baseURL, headers, timeouts)
+  - Interceptors (e.g., attach auth tokens, handle refresh tokens)
+  - Request cancellation (AbortController)
+  - Upload/download progress
+  - Consistent errors
+  - Easy query params
+
+
+#### 🛠 Setup Axios in React
+
+1. **Installation**
+
+First, you need to install Axios in your React project:
+
+```bash
+npm install axios
+```
+
+or
+
+```bash
+yarn add axios
+```
+
+#### 📌 Using Axios in React
+
+GET with loading/error states and safe cancellation:
+```javascript
+// src/components/UsersList.jsx
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL;
+
+export default function UsersList() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+
+    axios
+      .get(`${API_URL}/users`, { signal: controller.signal })
+      .then((res) => setUsers(res.data))
+      .catch((err) => {
+        if (axios.isCancel(err)) return; // request was canceled
+        setError(err.response?.data?.message || err.message);
+      })
+      .finally(() => setLoading(false));
+
+    return () => controller.abort(); // cancel on unmount
+  }, []);
+
+  if (loading) return <p>Loading…</p>;
+  if (error) return <p style={{ color: 'crimson' }}>Error: {error}</p>;
+
+  return (
+    <ul>
+      {users.map((u) => (
+        <li key={u.id}>{u.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+POST Request (Submitting a Form):
+```jsx
+import { useState } from "react";
+import axios from "axios";
+
+function SignupForm() {
+  const [form, setForm] = useState({ name: "", email: "" });
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post("https://jsonplaceholder.typicode.com/users", form);
+      alert("User created: " + JSON.stringify(res.data));
+    } catch (error) {
+      console.error("Signup failed:", error);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="name" placeholder="Name" value={form.name} onChange={handleChange} />
+      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} />
+      <button type="submit">Sign Up</button>
+    </form>
+  );
+}
+
+export default SignupForm;
+```
+
+PUT & DELETE Requests:
+```jsx
+import { useState } from "react";
+import axios from "axios";
+
+function UserManagement() {
+  const [user, setUser] = useState(null);
+
+  const updateUser = async (id, data) => {
+    try {
+      const response = await axios.put(`https://jsonplaceholder.typicode.com/users/${id}`, data);
+      setUser(response.data);
+      alert("User updated: " + JSON.stringify(response.data));
+    } catch (error) {
+      console.error("Update failed:", error);
+    }
+  };
+
+  const deleteUser = async (id) => {
+    try {
+      await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+      setUser(null);
+      alert("User deleted");
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  };
+
+  return (
+    <div>
+      <button onClick={() => updateUser(1, { name: "New Name" })}>Update User</button>
+      <button onClick={() => deleteUser(1)}>Delete User</button>
+      {user && <pre>{JSON.stringify(user, null, 2)}</pre>}
+    </div>
+  );
+}
+
+export default UserManagement;
+```
+
+
+#### ⚙️ Axios Features
+
+**🔄 Axios Instance (Reusable Configuration)**
+```javascript
+// src/api/axiosClient.js
+import axios from 'axios';
+
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+  timeout: 10000,          // 10s timeout
+  withCredentials: false,  // set true if you use cookie-based auth
+  headers: { 'Content-Type': 'application/json' },
+});
+```
+
+```javascript
+// src/services/users.js
+import { api } from '../api/axiosClient';
+
+export const UsersApi = {
+  list: (params) => api.get('/users', { params }).then((r) => r.data),
+  create: (payload) => api.post('/users', payload).then((r) => r.data),
+  remove: (id) => api.delete(`/users/${id}`).then((r) => r.data),
+};
+```
+
+Use in a component:
+```jsx
+import { useEffect, useState } from 'react';
+import { UsersApi } from '../services/users';
+
+export default function UsersList() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    UsersApi.list()
+      .then((d) => active && setData(d))
+      .catch((e) => active && setErr(e.response?.data?.message || e.message))
+      .finally(() => active && setLoading(false));
+    return () => { active = false };
+  }, []);
+
+  // render...
+}
+```
