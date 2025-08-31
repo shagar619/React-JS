@@ -2817,3 +2817,29 @@ export default function SearchBox() {
 
 **B) File upload with progress**
 ```javascript
+import { useState } from 'react';
+import { api } from '../api/axiosClient';
+
+export default function FileUploader() {
+  const [progress, setProgress] = useState(0);
+
+  const upload = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    await api.post('/files', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (evt) => {
+        if (!evt.total) return;
+        setProgress(Math.round((evt.loaded * 100) / evt.total));
+      },
+    });
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={(e) => e.target.files[0] && upload(e.target.files[0])} />
+      {progress > 0 && <p>Uploading: {progress}%</p>}
+    </div>
+  );
+}
+```
