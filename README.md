@@ -2875,3 +2875,45 @@ setPosts(posts.data);
 // For special cases, override per request:
 api.get('/slow', { timeout: 3000 }).catch((e) => console.log('Timed out', e.code));
 ```
+
+**F) Query params**
+```javascript
+api.get('/search', { params: { q: 'laptops', page: 2, tags: ['gaming', '16gb'] } });
+```
+
+**G) Cookies and CSRF (when using cookie-based auth)**
+```javascript
+// axiosClient
+export const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true, // send cookies
+  xsrfCookieName: 'XSRF-TOKEN', // optional, depends on backend
+  xsrfHeaderName: 'X-XSRF-TOKEN',
+});
+```
+
+**H) Integrate with React Query for caching, retries, dedup**
+
+```bash
+npm install @tanstack/react-query
+```
+
+```jsx
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import { UsersApi } from './services/users';
+
+const qc = new QueryClient();
+
+function Users() {
+  const { data, isLoading, error } = useQuery({ queryKey: ['users'], queryFn: UsersApi.list });
+  // ...
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={qc}>
+      <Users />
+    </QueryClientProvider>
+  );
+}
+```
