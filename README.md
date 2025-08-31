@@ -2774,3 +2774,46 @@ api.interceptors.response.use(
 );
 ```
 
+
+**A) Cancel and debounce (live search)**
+```javascript
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
+
+export default function SearchBox() {
+  const [q, setQ] = useState('');
+  const [results, setResults] = useState([]);
+
+  useEffect(() => {
+    if (!q.trim()) {
+      setResults([]);
+      return;
+    }
+    const controller = new AbortController();
+    const id = setTimeout(() => {
+      axios
+        .get(`${API_URL}/search`, { params: { q }, signal: controller.signal })
+        .then((r) => setResults(r.data))
+        .catch((e) => {
+          if (!axios.isCancel(e)) console.error(e);
+        });
+    }, 300); // debounce 300ms
+
+    return () => {
+      clearTimeout(id);
+      controller.abort();
+    };
+  }, [q]);
+
+  return (
+    <>
+      <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" />
+      <pre>{JSON.stringify(results, null, 2)}</pre>
+    </>
+  );
+}
+```
+
+**B) File upload with progress**
+```javascript
