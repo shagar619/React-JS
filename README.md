@@ -2862,3 +2862,10 @@ export async function downloadReport(id) {
 }
 ```
 
+**D) Concurrency: load several resources in parallel**
+
+```javascript
+const [users, posts] = await Promise.all([api.get('/users'), api.get('/posts')]);
+setUsers(users.data);
+setPosts(posts.data);
+```
