@@ -3491,3 +3491,47 @@ export type ApiResponse<T> = {
   errors?: Record<string, string[]>;
 };
 ```
+
+`client/src/api/axios.ts`
+```ts
+import axios from "axios";
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE,
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Optionally add interceptors for auth tokens/global errors
+// api.interceptors.request.use(config => { ...; return config; });
+
+export default api;
+```
+
+`client/src/validation/userSchema.ts`
+```ts
+import { z } from "zod";
+
+export const STRONG_PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8,64}$/;
+
+export const registerSchema = z.object({
+  firstName: z.string().min(2, "Min 2 chars").max(50),
+  lastName: z.string().min(2, "Min 2 chars").max(50),
+  email: z.string().email("Invalid email"),
+  password: z
+    .string()
+    .regex(STRONG_PASSWORD_REGEX, "8-64, upper/lower/number/special required"),
+  confirmPassword: z.string(),
+  role: z.enum(["user", "admin", "moderator"]),
+  gender: z.enum(["male", "female", "other"]),
+  terms: z.literal(true, { errorMap: () => ({ message: "Accept the terms" }) }),
+  bio: z.string().max(500).optional(),
+  recaptchaToken: z.string().min(10, "Captcha is required"),
+}).refine((v) => v.password === v.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+export type RegisterSchema = z.infer<typeof registerSchema>;
+```
