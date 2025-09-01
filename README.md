@@ -2979,3 +2979,25 @@ function Example() {
 
 export default Example;
 ```
+
+> When wrapped in `StrictMode`, the log will appear twice in development because React is checking for side effects.
+
+**📌 Example 2: Catching Deprecated Lifecycle Methods**
+```jsx
+import React from "react";
+
+class OldComponent extends React.Component {
+  componentWillMount() {
+    console.log("This method is deprecated!");
+  }
+
+  render() {
+    return <h2>Old Component</h2>;
+  }
+}
+
+export default OldComponent;
+```
+
+> 👉 In **Strict Mode**, React will warn you in the console about using `componentWillMount`.
+
