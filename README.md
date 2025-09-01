@@ -3391,3 +3391,66 @@ router.post("/register", async (req, res) => {
 
 export default router;
 ```
+
+`server/src/server.ts`
+```ts
+import express from "express";
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+import cors from "cors";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
+import authRoutes from "./routes/auth";
+
+dotenv.config();
+
+const app = express();
+app.use(express.json({ limit: "1mb" }));
+app.use(helmet());
+
+// CORS (allow your client)
+app.use(
+  cors({
+    origin: process.env.CLIENT_ORIGIN,
+    credentials: true,
+  })
+);
+
+// Basic rate limiting for auth routes
+const limiter = rateLimit({
+  windowMs: 60_000,
+  max: 60,
+});
+app.use("/api/", limiter);
+
+app.use("/api", authRoutes);
+
+// Health
+app.get("/health", (_req, res) => res.send("OK"));
+
+// Start
+const PORT = process.env.PORT || 5000;
+
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI!);
+    console.log("MongoDB connected");
+    app.listen(PORT, () =>
+      console.log(`Server running on http://localhost:${PORT}`)
+    );
+  } catch (e) {
+    console.error("Failed to start server", e);
+    process.exit(1);
+  }
+})();
+```
+
+**Run the backend:**
+```bash
+npm run dev
+```
+
+
+
+
+### Frontend (client)
