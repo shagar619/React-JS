@@ -3306,3 +3306,88 @@ User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
 export default User;
 ```
 
+`server/src/routes/auth.ts`
+```ts
+import { Router } from "express";
+import { z } from "zod";
+import bcrypt from "bcrypt";
+import User from "../models/User";
+import { registerSchema } from "../utils/validate";
+import axios from "axios";
+import type { ApiResponse } from "../types";
+
+const router = Router();
+
+router.post("/register", async (req, res) => {
+  try {
+    const parsed = registerSchema.safeParse(req.body);
+    if (!parsed.success) {
+      const errors: Record<string, string[]> = {};
+      parsed.error.errors.forEach((e) => {
+        const key = e.path.join(".") || "form";
+        errors[key] = errors[key] || [];
+        errors[key].push(e.message);
+      });
+      const payload: ApiResponse<null> = {
+        success: false,
+        message: "Validation failed",
+        errors,
+      };
+      return res.status(400).json(payload);
+    }
+
+    const {
+      firstName, lastName, email, password, role, gender, bio, recaptchaToken,
+    } = parsed.data;
+
+    // Verify reCAPTCHA with Google
+    const secret = process.env.RECAPTCHA_SECRET!;
+    const verificationURL = "https://www.google.com/recaptcha/api/siteverify";
+    const verify = await axios.post(
+      verificationURL,
+      new URLSearchParams({
+        secret,
+        response: recaptchaToken,
+        remoteip: req.ip || "",
+      }),
+      { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+    );
+
+    if (!verify.data.success) {
+      return res.status(400).json({
+        success: false,
+        message: "Captcha verification failed.",
+        errors: { recaptchaToken: ["Invalid captcha."] },
+      } satisfies ApiResponse<null>);
+    }
+
+    const existing = await User.findOne({ email });
+    if (existing) {
+      return res.status(409).json({
+        success: false,
+        message: "Email already in use.",
+        errors: { email: ["Email is already registered."] },
+      } satisfies ApiResponse<null>);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await User.create({
+      firstName, lastName, email, role, gender, bio, passwordHash,
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Registration successful",
+      data: { id: user._id, email: user.email, firstName: user.firstName },
+    } satisfies ApiResponse<{ id: string; email: string; firstName: string }>);
+  } catch (err: any) {
+    console.error(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    } satisfies ApiResponse<null>);
+  }
+});
+
+export default router;
+```
