@@ -3743,3 +3743,22 @@ function App() {
 
 export default App;
 ```
+
+`client/src/main.tsx`
+```tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+```
+
+**Run the frontend:**
+```bash
+npm run dev
+```
