@@ -3024,5 +3024,32 @@ By default, React is a client-side library → it runs in the browser, rendering
 React provides an API:
 
 - `renderToString()` → Converts components to HTML string.
-
 - `renderToPipeableStream()` (React 18+) → Supports streaming SSR (send HTML chunks before full render finishes).
+
+👉 Example with Express.js:
+```jsx
+// server.js
+import express from "express";
+import React from "react";
+import { renderToString } from "react-dom/server";
+import App from "./src/App";
+
+const app = express();
+
+app.get("*", (req, res) => {
+  const html = renderToString(<App />);
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+      <head><title>SSR Example</title></head>
+      <body>
+        <div id="root">${html}</div>
+        <script src="/client_bundle.js"></script>
+      </body>
+    </html>
+  `);
+});
+
+app.listen(3000, () => console.log("Server running on http://localhost:3000"));
+```
+
