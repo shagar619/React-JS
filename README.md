@@ -3535,3 +3535,211 @@ export const registerSchema = z.object({
 
 export type RegisterSchema = z.infer<typeof registerSchema>;
 ```
+
+`client/src/App.tsx`
+```tsx
+import { useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import ReCAPTCHA from "react-google-recaptcha";
+import api from "./api/axios";
+import { registerSchema, RegisterSchema } from "./validation/userSchema";
+import type { ApiResponse } from "./types";
+
+function App() {
+  const [serverMessage, setServerMessage] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+    reset,
+  } = useForm<RegisterSchema>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      role: "user",
+      gender: "other",
+      terms: false,
+    },
+  });
+
+  const onCaptchaChange = (token: string | null) => {
+    setValue("recaptchaToken", token || "");
+  };
+
+  const onSubmit = async (values: RegisterSchema) => {
+    try {
+      setSubmitting(true);
+      setServerMessage(null);
+
+      const res = await api.post<ApiResponse<{ id: string; email: string }>>(
+        "/register",
+        values
+      );
+
+      if (res.data.success) {
+        setServerMessage(`✅ Registered: ${res.data.data?.email}`);
+        reset({ role: "user", gender: "other", terms: false, recaptchaToken: "" });
+        recaptchaRef.current?.reset();
+      } else {
+        setServerMessage(res.data.message || "Registration failed.");
+      }
+    } catch (err: any) {
+      if (err.response?.data?.errors) {
+        const e = err.response.data as ApiResponse<null>;
+        setServerMessage(
+          "❌ " + (e.message || "Validation error. Check fields and try again.")
+        );
+      } else {
+        setServerMessage("❌ Network/server error. Please try again.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <main style={{ maxWidth: 560, margin: "40px auto", padding: 16 }}>
+      <h1>Full Signup (React Hook Form + Axios + Captcha)</h1>
+      <p style={{ color: "#666" }}>
+        Password: 8–64 chars, include upper, lower, number & special.
+      </p>
+
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div style={{ display: "grid", gap: 12 }}>
+          {/* First Name */}
+          <label>
+            First Name
+            <input {...register("firstName")} placeholder="Jane" />
+            {errors.firstName && (
+              <small style={{ color: "crimson" }}>{errors.firstName.message}</small>
+            )}
+          </label>
+
+          {/* Last Name */}
+          <label>
+            Last Name
+            <input {...register("lastName")} placeholder="Doe" />
+            {errors.lastName && (
+              <small style={{ color: "crimson" }}>{errors.lastName.message}</small>
+            )}
+          </label>
+
+          {/* Email */}
+          <label>
+            Email
+            <input type="email" {...register("email")} placeholder="jane@acme.com" />
+            {errors.email && (
+              <small style={{ color: "crimson" }}>{errors.email.message}</small>
+            )}
+          </label>
+
+          {/* Password */}
+          <label>
+            Password
+            <input type="password" {...register("password")} />
+            {errors.password && (
+              <small style={{ color: "crimson" }}>{errors.password.message}</small>
+            )}
+          </label>
+
+          {/* Confirm Password */}
+          <label>
+            Confirm Password
+            <input type="password" {...register("confirmPassword")} />
+            {errors.confirmPassword && (
+              <small style={{ color: "crimson" }}>
+                {errors.confirmPassword.message}
+              </small>
+            )}
+          </label>
+
+          {/* Role */}
+          <label>
+            Role
+            <select {...register("role")}>
+              <option value="user">User</option>
+              <option value="admin">Admin</option>
+              <option value="moderator">Moderator</option>
+            </select>
+            {errors.role && (
+              <small style={{ color: "crimson" }}>{errors.role.message}</small>
+            )}
+          </label>
+
+          {/* Gender */}
+          <fieldset>
+            <legend>Gender</legend>
+            <label>
+              <input type="radio" value="male" {...register("gender")} /> Male
+            </label>
+            <label>
+              <input type="radio" value="female" {...register("gender")} /> Female
+            </label>
+            <label>
+              <input type="radio" value="other" {...register("gender")} /> Other
+            </label>
+            {errors.gender && (
+              <small style={{ color: "crimson" }}>{errors.gender.message}</small>
+            )}
+          </fieldset>
+
+          {/* Bio */}
+          <label>
+            Bio (optional)
+            <textarea rows={4} {...register("bio")} placeholder="Tell us about you..." />
+            {errors.bio && (
+              <small style={{ color: "crimson" }}>{errors.bio.message}</small>
+            )}
+          </label>
+
+          {/* Terms */}
+          <label>
+            <input type="checkbox" {...register("terms")} /> I accept the Terms
+            {errors.terms && (
+              <small style={{ color: "crimson", display: "block" }}>
+                {errors.terms.message}
+              </small>
+            )}
+          </label>
+
+          {/* Captcha */}
+          <ReCAPTCHA
+            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+            onChange={onCaptchaChange}
+            ref={recaptchaRef}
+          />
+          {errors.recaptchaToken && (
+            <small style={{ color: "crimson" }}>
+              {errors.recaptchaToken.message}
+            </small>
+          )}
+
+          {/* Submit */}
+          <button type="submit" disabled={submitting}>
+            {submitting ? "Submitting..." : "Create Account"}
+          </button>
+        </div>
+      </form>
+
+      {serverMessage && (
+        <div
+          style={{
+            marginTop: 16,
+            padding: 12,
+            background: "#f7f7f7",
+            borderRadius: 8,
+          }}
+        >
+          {serverMessage}
+        </div>
+      )}
+    </main>
+  );
+}
+
+export default App;
+```
