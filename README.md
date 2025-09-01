@@ -3257,3 +3257,52 @@ export const registerSchema = z.object({
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 ```
+
+`server/src/models/User.ts`
+```ts
+import mongoose, { Schema, Document, Model } from "mongoose";
+import bcrypt from "bcrypt";
+
+export interface IUser extends Document {
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: "user" | "admin" | "moderator";
+  gender: "male" | "female" | "other";
+  bio?: string;
+  passwordHash: string;
+  comparePassword(candidate: string): Promise<boolean>;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    firstName: { type: String, required: true, trim: true },
+    lastName:  { type: String, required: true, trim: true },
+    email:     { type: String, required: true, unique: true, lowercase: true, trim: true },
+    role:      { type: String, enum: ["user", "admin", "moderator"], default: "user" },
+    gender:    { type: String, enum: ["male", "female"], required: true },
+    bio:       { type: String },
+    passwordHash: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+UserSchema.methods.comparePassword = function (candidate: string) {
+  return bcrypt.compare(candidate, this.passwordHash);
+};
+
+UserSchema.pre("save", async function (next) {
+  const user = this as IUser;
+  if (user.isModified("passwordHash")) {
+    // Already hashed—do nothing
+    return next();
+  }
+  next();
+});
+
+let User: Model<IUser>;
+User = mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+
+export default User;
+```
+
