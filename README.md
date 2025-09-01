@@ -3111,3 +3111,40 @@ export async function getServerSideProps() {
 **4. Data Fetching** → Needs server + client coordination.
 
 
+
+## React-Hook-Form
+
+React Hook Form is a library that helps you manage form state and validation in React applications. It provides a simple and efficient way to handle forms with minimal re-renders and better performance.
+
+Below is a complete, TypeScript, end-to-end example using React Hook Form + Zod (frontend) and Express + Mongoose (backend), with Axios for submission, strong password validation, Google reCAPTCHA v2, proper error handling, and saving to MongoDB.
+
+- **Frontend**: React Hook Form + Zod validation, reCAPTCHA, error handling, Axios POST
+- **Backend**: Express + Mongoose, zod input validation, reCAPTCHA verification, bcrypt password hashing, duplicate email checks, and robust error responses
+
+#### 🧱 Folder Structure
+```pgsql
+/fullstack-signup
+  /client  (React + Vite + TS)
+    src/
+      api/axios.ts
+      validation/userSchema.ts
+      types.ts
+      App.tsx
+      main.tsx
+      index.css
+    index.html
+    package.json
+    vite.config.ts
+    .env        # REACT side (Vite prefix: VITE_)
+  /server  (Express + TS + Mongoose)
+    src/
+      models/User.ts
+      routes/auth.ts
+      utils/validate.ts
+      utils/password.ts
+      server.ts
+      types.ts
+    package.json
+    tsconfig.json
+    .env        # SERVER secrets
+```
