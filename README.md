@@ -3454,3 +3454,40 @@ npm run dev
 
 
 ### Frontend (client)
+
+```bash
+cd ../
+mkdir -p client && cd client
+npm create vite@latest . -- --template react-ts
+npm i axios react-hook-form zod @hookform/resolvers react-google-recaptcha
+npm run dev
+```
+
+client/.env (Vite env vars must start with `VITE_`)
+```ini
+VITE_API_URL=http://localhost:5000/api
+VITE_RECAPTCHA_SITE_KEY=your-site-key
+```
+
+`client/src/types.ts`
+```ts
+export type RegisterFormValues = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  role: "user" | "admin" | "moderator";
+  gender: "male" | "female" | "other";
+  terms: boolean;
+  bio?: string;
+  recaptchaToken: string;
+};
+
+export type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data?: T;
+  errors?: Record<string, string[]>;
+};
+```
