@@ -3001,3 +3001,28 @@ export default OldComponent;
 
 > 👉 In **Strict Mode**, React will warn you in the console about using `componentWillMount`.
 
+
+## 🔹How does React handle server-side rendering (SSR)?
+
+By default, React is a client-side library → it runs in the browser, rendering UI after JavaScript loads.
+
+**👉 Problem:** On first page load, users (and search engines like Google) see a blank screen until JS is downloaded & executed.
+
+**👉 Solution:** Server-Side Rendering (SSR) → React components are rendered on the server into HTML, sent to the browser, and then React "hydrates" the page (attaches event listeners, making it interactive).
+
+#### 🔄 How SSR Works in React
+
+**1. Client Request:** User requests a page (`/products`).
+**2. Server Render:** React on the server converts components → HTML string.
+**3. Send HTML:** Browser immediately displays full HTML (fast, SEO-friendly).
+**4. Hydration:** React loads JavaScript, attaches interactivity to that HTML.
+
+#### 🛠 Implementing SSR in React
+
+**1. Without Frameworks (using `react-dom/server`)**
+
+React provides an API:
+
+- `renderToString()` → Converts components to HTML string.
+
+- `renderToPipeableStream()` (React 18+) → Supports streaming SSR (send HTML chunks before full render finishes).
