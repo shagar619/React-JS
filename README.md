@@ -3148,3 +3148,78 @@ Below is a complete, TypeScript, end-to-end example using React Hook Form + Zod 
     tsconfig.json
     .env        # SERVER secrets
 ```
+
+#### ▶️ Quick Start
+
+**1) Backend (server)**
+```bash
+mkdir -p fullstack-signup/server && cd fullstack-signup/server
+npm init -y
+npm i express mongoose dotenv zod bcrypt jsonwebtoken cors helmet express-rate-limit axios
+npm i -D typescript ts-node-dev @types/express @types/cors @types/node
+npx tsc --init
+```
+
+`server/.env`
+```ts
+import dotenv from "dotenv";
+dotenv.config();
+
+const get = (name: string, fallback?: string) => {
+  const v = process.env[name] ?? fallback;
+  if (v === undefined) {
+    throw new Error(`Missing required env var: ${name}`);
+  }
+  return v;
+};
+
+export const env = {
+  PORT: parseInt(get("PORT", "4000"), 10),
+  MONGODB_URI: get("MONGODB_URI"),
+  RECAPTCHA_SECRET: get("RECAPTCHA_SECRET"),
+  CLIENT_ORIGIN: get("CLIENT_ORIGIN"),
+  NODE_ENV: get("NODE_ENV", "production"),
+};
+```
+
+`server/tsconfig.json (minimal)`
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+`server/package.json (scripts)`
+```json
+{
+  "name": "signup-server",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  }
+}
+```
+
+### Server Code
+
+`server/src/types.ts`
+```ts
+export type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data?: T;
+  errors?: Record<string, string[]>;
+};
+```
