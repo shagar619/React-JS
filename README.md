@@ -2917,3 +2917,19 @@ export default function App() {
   );
 }
 ```
+
+
+## 🔹What is the Strict Mode in React?
+
+**StrictMode** is a development-only feature in React.
+It does not affect production builds and doesn’t render anything to the DOM.
+
+Instead, it helps developers:
+
+- Detect potential problems in their React code.
+- Enforce best practices.
+- Prepare apps for future versions of React.
+
+#### 🛠 Enable Strict Mode
+
+Wrap your app (or part of your app) in `<React.StrictMode>` inside `index.js`:
