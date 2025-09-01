@@ -3223,3 +3223,37 @@ export type ApiResponse<T> = {
   errors?: Record<string, string[]>;
 };
 ```
+
+`server/src/utils/password.ts`
+```ts
+export const STRONG_PASSWORD_REGEX =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[ !"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]).{8,64}$/;
+// At least 8 chars, 1 lowercase, 1 uppercase, 1 number, 1 special, up to 64, allows most symbols
+```
+
+`server/src/utils/validate.ts`
+```ts
+import { z } from "zod";
+import { STRONG_PASSWORD_REGEX } from "./password";
+
+export const registerSchema = z.object({
+  firstName: z.string().min(2).max(50),
+  lastName: z.string().min(2).max(50),
+  email: z.string().email(),
+  password: z.string().regex(STRONG_PASSWORD_REGEX, {
+    message:
+      "Password must be 8-64 chars and include upper, lower, number, and special.",
+  }),
+  confirmPassword: z.string(),
+  role: z.enum(["user", "admin", "moderator"]),
+  gender: z.enum(["male", "female", "other"]),
+  terms: z.boolean().refine((v) => v === true, "You must accept the terms."),
+  bio: z.string().max(500).optional(),
+  recaptchaToken: z.string().min(10),
+}).refine((data) => data.password === data.confirmPassword, {
+  path: ["confirmPassword"],
+  message: "Passwords do not match.",
+});
+
+export type RegisterInput = z.infer<typeof registerSchema>;
+```
