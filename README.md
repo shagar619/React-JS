@@ -3053,3 +3053,45 @@ app.get("*", (req, res) => {
 app.listen(3000, () => console.log("Server running on http://localhost:3000"));
 ```
 
+👉 On the browser, React hydrates the markup:
+```jsx
+import React from "react";
+import { hydrateRoot } from "react-dom/client";
+import App from "./App";
+
+hydrateRoot(document.getElementById("root"), <App />);
+```
+
+**2. With Frameworks (Recommended in Professional Projects)**
+
+Most teams don’t build SSR from scratch → they use frameworks like:
+
+- **Next.js** → Most popular React SSR framework.
+- **Remix** → SSR with data-loading focus.
+
+👉 Example with **Next.js** (much simpler):
+
+```jsx
+// pages/index.js
+export default function Home({ products }) {
+  return (
+    <div>
+      <h1>Product List</h1>
+      <ul>
+        {products.map((p) => (
+          <li key={p.id}>{p.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export async function getServerSideProps() {
+  const res = await fetch("https://fakestoreapi.com/products");
+  const products = await res.json();
+  return { props: { products } };
+}
+```
+
+> ✅ On every request, Next.js renders HTML on the server → SEO-friendly, faster first load.
+
