@@ -2933,3 +2933,49 @@ Instead, it helps developers:
 #### 🛠 Enable Strict Mode
 
 Wrap your app (or part of your app) in `<React.StrictMode>` inside `index.js`:
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+```
+
+> 👉 It only applies in development mode.
+
+#### 🔍 What Strict Mode Checks For
+
+**1. Unsafe Lifecycles**
+- Warns if you use deprecated lifecycle methods (`componentWillMount`, `componentWillReceiveProps`, etc.).
+
+**2. Legacy String Refs**
+- Warns if you use old ref syntax (`ref="myRef"`) instead of `React.createRef()` or `useRef()`.
+
+**3. Unexpected Side Effects**
+- Runs functions like `useEffect` twice in development to ensure code is side-effect free and resilient.
+
+**4. Deprecated APIs**
+- Warns about APIs that React plans to remove.
+
+**5. Detects Missing Keys in Lists**
+- Helps prevent rendering issues when using `.map()` for lists.
+
+
+**📌 Example 1: Detecting Side Effects**
+```jsx
+import { useEffect } from "react";
+
+function Example() {
+  useEffect(() => {
+    console.log("Effect executed!");
+  }, []);
+
+  return <h1>Hello Strict Mode</h1>;
+}
+
+export default Example;
+```
