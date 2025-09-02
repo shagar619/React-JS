@@ -4043,3 +4043,33 @@ export default function App() {
 ✅ Now, React will only load Dashboard or Profile when they’re rendered.
 ✅ `<Suspense>` shows a loading spinner/loader until the component is ready.
 
+🌍 Example: React Router + Lazy Loading
+```tsx
+import React, { Suspense, lazy } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Contact = lazy(() => import("./pages/Contact"));
+
+export default function App() {
+  return (
+    <Router>
+      <Suspense fallback={<div>Loading page...</div>}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
+      </Suspense>
+    </Router>
+  );
+}
+```
+
+**📊 Benefits of Lazy Loading**
+
+- **Faster Initial Load** → Loads only what’s needed.
+- **Better Performance** → Reduces bundle size.
+- **Improved User Experience** → Users don’t download unnecessary code.
+- **Scalable Apps** → Essential for large apps with many pages/components.
