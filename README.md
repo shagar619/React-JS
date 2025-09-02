@@ -971,6 +971,15 @@ export default function Root() {
 }
 ```
 
+**The major components of React Router are given below:**
+
+- **BrowserRouter**: It is a router implementation that will make use of the HTML5 history API (pushState, popstate, and event replaceState) for keeping your UI to be in sync with the URL. It is the parent component useful in storing all other components.
+- **Routes**: It is a newer component that has been introduced in the React v6 and an upgrade of the component.
+- **Route**: It is considered to be a conditionally shown component and some UI will be rendered by this whenever there is a match between its path and the current URL.
+- **Link**: It is useful in creating links to various routes and implementing navigation all over the application. It works similarly to the anchor tag in HTML.
+
+
+
 **Features with React Router v6**
 
 ✅ Navigation state and GET forms (URL-driven search)
