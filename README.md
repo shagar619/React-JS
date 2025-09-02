@@ -3984,3 +3984,62 @@ export default function RegisterForm() {
   );
 }
 ```
+
+
+## What is Lazy Loading in React?
+
+⚡Lazy loading (also called code splitting) means loading components only when they’re needed, instead of loading the entire app at once.
+
+By default, React bundles the whole app into one large JavaScript file. For big applications, this increases initial load time.
+
+Lazy Loading helps by splitting code into smaller chunks → React loads them on demand when the user visits that part of the app.
+
+
+**🔑 How Lazy Loading Works in React**
+
+React provides:
+
+- `React.lazy()`: A function that lets you render a dynamic import as a regular component.
+- `Suspense`: A component that wraps lazy components and allows you to show a fallback (e.g., loading spinner) while the lazy component is loading.
+
+📝 Example: Without Lazy Loading
+```tsx
+import React from "react";
+import Dashboard from "./components/Dashboard";
+import Profile from "./components/Profile";
+
+export default function App() {
+  return (
+    <div>
+      <Dashboard />
+      <Profile />
+    </div>
+  );
+}
+```
+⚠️ Problem:
+Both `Dashboard` and `Profile` are bundled and loaded on initial render, even if the user never visits Profile.
+
+
+📝 Example: With Lazy Loading
+```tsx
+import React, { Suspense, lazy } from "react";
+
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const Profile = lazy(() => import("./components/Profile"));
+
+export default function App() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <Dashboard />
+        <Profile />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+✅ Now, React will only load Dashboard or Profile when they’re rendered.
+✅ `<Suspense>` shows a loading spinner/loader until the component is ready.
+
