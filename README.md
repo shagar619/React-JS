@@ -4176,3 +4176,57 @@ export default function App() {
 }
 ```
 
+## What is Reoncillation in React?
+
+**Reconciliation** is the process React uses to decide:
+👉 “How should I update the DOM when the application’s state or props change?”
+
+Instead of re-rendering the whole UI, React compares the **Virtual DOM** (new tree) with the previous **Virtual DOM** (old tree) and efficiently updates only what has changed.
+
+This algorithm is called the **Diffing Algorithm**.
+
+#### 🔄 The Reconciliation Process
+
+**1. Trigger:** A component’s state or props change.
+**2. Re-render Virtual DOM:** React creates a new Virtual DOM tree.
+**3. Diffing:** React compares the new tree with the previous one.
+**4. Minimal DOM Updates:** React updates only the nodes that changed.
+
+🏗️ Example (Todo App):
+```jsx
+function TodoList({ todos }) {
+  return (
+    <ul>
+      {todos.map((t) => (
+        <li key={t.id}>{t.task}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**Why `key` is Important in Reconciliation**
+
+- React uses the `key` prop to identify list items.
+- If keys are stable, React reuses existing DOM elements instead of deleting and re-creating them.
+
+**🔴 Bad Example (No keys)**
+```jsx
+<ul>
+  <li>Buy Milk</li>
+  <li>Read Book</li>
+</ul>
+```
+
+> If "Buy Milk" is removed → React might re-render all <li> elements.
+
+
+**🟢 Good Example (Using keys)**
+```jsx
+<ul>
+  <li key="1">Buy Milk</li>
+  <li key="2">Read Book</li>
+</ul>
+```
+
+> If "Buy Milk" is removed → React knows only key="1" is gone and updates efficiently.
