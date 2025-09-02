@@ -4277,3 +4277,142 @@ export default function Login() {
   return <button onClick={handleLogin}>Login</button>;
 }
 ```
+
+**2. Using `<Navigate />` Component (Conditional Redirect)**
+```tsx
+import React, { useState } from "react";
+import { Navigate } from "react-router-dom";
+
+export default function Login() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = () => {
+    // Perform login logic
+    setIsLoggedIn(true);
+  };
+
+  if (isLoggedIn) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <button onClick={handleLogin}>Login</button>;
+}
+```
+
+**3. Redirect Using `useEffect` Hook**
+
+This is useful when login is handled via context or global state.
+```tsx
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function LoginSuccess({ isAuthenticated }: { isAuthenticated: boolean }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  return <h2>Logging in...</h2>;
+}
+```
+
+**4. Redirect Based on `localStorage` / `JWT Token`**
+
+If you store login tokens in `localStorage`, you can redirect after checking them:
+
+```tsx
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
+export default function LoginCheck() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("authToken");
+    if (token) {
+      navigate("/dashboard");
+    }
+  }, [navigate]);
+
+  return <h1>Please Login</h1>;
+}
+```
+
+**5. Redirect Using a Protected Route (Best Practice for Larger Apps)**
+```tsx
+import { Navigate } from "react-router-dom";
+
+function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const token = localStorage.getItem("authToken");
+  return token ? children : <Navigate to="/login" replace />;
+}
+```
+
+Then use it in your routes:
+```tsx
+<Routes>
+  <Route path="/login" element={<Login />} />
+  <Route
+    path="/dashboard"
+    element={
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
+    }
+  />
+</Routes>
+```
+
+**6. Redirect with Context (AuthProvider)**
+
+Create a global AuthContext:
+
+```tsx
+import React, { createContext, useState, useContext } from "react";
+
+interface AuthContextType {
+  user: string | null;
+  login: (user: string) => void;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<string | null>(null);
+
+  const login = (newUser: string) => setUser(newUser);
+  const logout = () => setUser(null);
+
+  return (
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext)!;
+}
+```
+
+Use inside Login:
+```tsx
+import { useAuth } from "./AuthProvider";
+import { useNavigate } from "react-router-dom";
+
+function Login() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    login("John Doe");
+    navigate("/dashboard");
+  };
+
+  return <button onClick={handleLogin}>Login</button>;
+}
+```
