@@ -4073,3 +4073,47 @@ export default function App() {
 - **Better Performance** → Reduces bundle size.
 - **Improved User Experience** → Users don’t download unnecessary code.
 - **Scalable Apps** → Essential for large apps with many pages/components.
+
+
+### What is Memoization in React?
+
+Memoization is an optimization technique that speeds up rendering by caching the result of a function call and returning the cached result when the same inputs occur again.
+
+In React, memoization helps avoid expensive calculations or re-renders when component props/state haven't changed.
+
+
+**🔑 React Tools for Memoization**
+
+React provides 3 main tools:
+
+**1. `React.memo()`**
+   - Wraps a functional component to prevent re-renders if props haven’t changed.
+
+**2. `useMemo()`**
+   - Memoizes the result of a function to avoid expensive recalculations.
+
+**3. `useCallback()`**
+   - Returns a memoized callback function to prevent unnecessary re-renders.
+
+📌 1. `React.memo()` Example:
+```tsx
+import React from "react";
+
+type Props = { name: string };
+
+const Child = React.memo(({ name }: Props) => {
+  console.log("Child re-rendered");
+  return <h2>Hello, {name}</h2>;
+});
+
+export default function App() {
+  const [count, setCount] = React.useState(0);
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Increment: {count}</button>
+      <Child name="Alice" />
+    </div>
+  );
+}
+```
