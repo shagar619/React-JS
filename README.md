@@ -3762,3 +3762,225 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 ```bash
 npm run dev
 ```
+
+
+### 🎨 Full UI Implementation (Frontend)
+
+#### 🛠️ Setup
+
+Install dependencies:
+```bash
+npm install @mui/material @mui/icons-material @emotion/react @emotion/styled
+npm install react-hook-form yup @hookform/resolvers axios
+npm install react-google-recaptcha
+```
+
+`src/components/RegisterForm.tsx`
+```tsx
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Container,
+  Grid,
+  TextField,
+  Typography,
+  Alert,
+  InputAdornment,
+  IconButton,
+} from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import axios from "axios";
+import ReCAPTCHA from "react-google-recaptcha";
+
+// ✅ Validation Schema
+const schema = yup.object().shape({
+  name: yup.string().required("Full Name is required"),
+  email: yup.string().email("Invalid email").required("Email is required"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(8, "At least 8 characters")
+    .matches(/[A-Z]/, "Must contain uppercase letter")
+    .matches(/[a-z]/, "Must contain lowercase letter")
+    .matches(/[0-9]/, "Must contain a number")
+    .matches(/[@$!%*?&]/, "Must contain a special character"),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref("password")], "Passwords must match"),
+});
+
+type FormData = yup.InferType<typeof schema>;
+
+export default function RegisterForm() {
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: yupResolver(schema),
+  });
+
+  const onSubmit = async (data: FormData) => {
+    if (!captchaToken) {
+      setError("Please complete the captcha");
+      return;
+    }
+    setError(null);
+    setSuccess(null);
+    setLoading(true);
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/register", {
+        ...data,
+        captchaToken,
+      });
+
+      setSuccess(res.data.message || "Registration successful!");
+      reset();
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Container maxWidth="sm">
+      <Box
+        sx={{
+          mt: 5,
+          p: 4,
+          border: "1px solid #ddd",
+          borderRadius: 3,
+          boxShadow: 3,
+          backgroundColor: "white",
+        }}
+      >
+        <Typography variant="h4" textAlign="center" gutterBottom>
+          Register
+        </Typography>
+
+        {error && <Alert severity="error">{error}</Alert>}
+        {success && <Alert severity="success">{success}</Alert>}
+
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Grid container spacing={2} mt={1}>
+            <Grid item xs={12}>
+              <Controller
+                name="name"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Full Name"
+                    fullWidth
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Email"
+                    fullWidth
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="password"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    type={showPassword ? "text" : "password"}
+                    label="Password"
+                    fullWidth
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            onClick={() => setShowPassword((prev) => !prev)}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Controller
+                name="confirmPassword"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    type="password"
+                    label="Confirm Password"
+                    fullWidth
+                    error={!!errors.confirmPassword}
+                    helperText={errors.confirmPassword?.message}
+                  />
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} display="flex" justifyContent="center">
+              <ReCAPTCHA
+                sitekey="YOUR_RECAPTCHA_SITE_KEY"
+                onChange={(token) => setCaptchaToken(token)}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                disabled={loading}
+                startIcon={loading && <CircularProgress size={20} />}
+              >
+                {loading ? "Submitting..." : "Register"}
+              </Button>
+            </Grid>
+          </Grid>
+        </form>
+      </Box>
+    </Container>
+  );
+}
+```
