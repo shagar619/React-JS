@@ -552,6 +552,14 @@ export default UserProfile;
 - Render multiple items with `.map()`.
 - Keys help React identify elements and update efficiently.
 
+**Importance of keys -**
+
+- Keys help react identify which elements were added, changed or removed.
+- Keys should be given to array elements for providing a unique identity for each element.
+- Without keys, React does not understand the order or uniqueness of each element.
+- With keys, React has an idea of which particular element was deleted, edited, and added.
+- Keys are generally used for displaying a list of data coming from an API.
+
 📌 Example:
 
 ```jsx
@@ -568,6 +576,7 @@ const root = ReactDOM.createRoot(document.getElementById("root"));  // Create th
 root.render(<ul>{updatedNums}</ul>);  // Render the list into the root element
 ```
 
+> Note- Keys used within arrays should be unique among siblings. They need not be globally unique.
 
 ### Lifecycle (Class) / Hooks (Function)
 
