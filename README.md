@@ -4230,3 +4230,15 @@ function TodoList({ todos }) {
 ```
 
 > If "Buy Milk" is removed → React knows only key="1" is gone and updates efficiently.
+
+**📌 Key Rules of Reconciliation**
+
+1. Different Element Types → Replace DOM Node
+   - `<div>` → `<p>` → React destroys `<div>` and creates `<p>`.
+
+2. Same Element Type → Update Attributes
+   - `<input type="text" />` → `<input type="password" />` → React updates type.
+
+3. Children with Keys → Optimized Updates
+   - Helps React reorder, add, or remove efficiently.
+
