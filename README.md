@@ -4416,3 +4416,54 @@ function Login() {
   return <button onClick={handleLogin}>Login</button>;
 }
 ```
+
+## How to pass data between sibling components using React router?
+
+#### ⚡ Ways to Pass Data Between Sibling Components with React Router
+
+**1. Using a Common Parent (Lift State Up)**
+
+The most React way: store data in a common parent that renders both siblings, then pass props down.
+
+```tsx
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+function Parent() {
+  const [message, setMessage] = useState("Hello from Parent!");
+
+  return (
+    <Router>
+      <nav>
+        <Link to="/sibling1">Sibling 1</Link>
+        <Link to="/sibling2">Sibling 2</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/sibling1" element={<Sibling1 setMessage={setMessage} />} />
+        <Route path="/sibling2" element={<Sibling2 message={message} />} />
+      </Routes>
+    </Router>
+  );
+}
+
+function Sibling1({ setMessage }: { setMessage: (msg: string) => void }) {
+  return (
+    <div>
+      <h2>Sibling 1</h2>
+      <button onClick={() => setMessage("Data from Sibling 1!")}>
+        Send to Sibling 2
+      </button>
+    </div>
+  );
+}
+
+function Sibling2({ message }: { message: string }) {
+  return (
+    <div>
+      <h2>Sibling 2</h2>
+      <p>Received: {message}</p>
+    </div>
+  );
+}
+```
