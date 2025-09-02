@@ -4467,3 +4467,134 @@ function Sibling2({ message }: { message: string }) {
   );
 }
 ```
+
+**2. Using React Router’s `state` (Navigation State)**
+
+You can pass data via `navigate()` or `<Link />` using the `state` prop.
+```tsx
+import { useLocation, useNavigate } from "react-router-dom";
+
+function Sibling1() {
+  const navigate = useNavigate();
+
+  return (
+    <div>
+      <h2>Sibling 1</h2>
+      <button
+        onClick={() =>
+          navigate("/sibling2", { state: { message: "Data from Sibling 1!" } })
+        }
+      >
+        Go to Sibling 2
+      </button>
+    </div>
+  );
+}
+
+function Sibling2() {
+  const location = useLocation();
+  return (
+    <div>
+      <h2>Sibling 2</h2>
+      <p>Received: {location.state?.message}</p>
+    </div>
+  );
+}
+```
+
+**3. Using URL Params / Query Strings**
+
+Pass data in the URL, then read it in the sibling.
+```tsx
+import { useParams, useNavigate } from "react-router-dom";
+
+function Sibling1() {
+  const navigate = useNavigate();
+  return (
+    <button onClick={() => navigate("/sibling2/HelloFromSibling1")}>
+      Send Data via URL
+    </button>
+  );
+}
+
+function Sibling2() {
+  const { msg } = useParams();
+  return <p>Received: {msg}</p>;
+}
+```
+
+**4. Using Context API (Global State)**
+
+Create a context that both siblings can access.
+```tsx
+import React, { createContext, useContext, useState } from "react";
+import { Routes, Route } from "react-router-dom";
+
+const MessageContext = createContext<any>(null);
+
+function Parent() {
+  const [message, setMessage] = useState("");
+
+  return (
+    <MessageContext.Provider value={{ message, setMessage }}>
+      <Routes>
+        <Route path="/sibling1" element={<Sibling1 />} />
+        <Route path="/sibling2" element={<Sibling2 />} />
+      </Routes>
+    </MessageContext.Provider>
+  );
+}
+
+function Sibling1() {
+  const { setMessage } = useContext(MessageContext);
+  return (
+    <button onClick={() => setMessage("Message from Sibling 1!")}>
+      Send to Sibling 2
+    </button>
+  );
+}
+
+function Sibling2() {
+  const { message } = useContext(MessageContext);
+  return <p>Received: {message}</p>;
+}
+```
+
+**5. Using a State Management Library (Redux, Zustand, Recoil, etc.)**
+
+If your app is large-scale, siblings can share data via a centralized store.
+
+Redux Example (simplified):
+```tsx
+// actions.ts
+export const setMessage = (msg: string) => ({ type: "SET_MESSAGE", payload: msg });
+
+// reducer.ts
+const initialState = { message: "" };
+export function reducer(state = initialState, action: any) {
+  if (action.type === "SET_MESSAGE") {
+    return { ...state, message: action.payload };
+  }
+  return state;
+}
+
+// Sibling1.tsx
+import { useDispatch } from "react-redux";
+function Sibling1() {
+  const dispatch = useDispatch();
+  return (
+    <button onClick={() => dispatch(setMessage("Data from Sibling 1!"))}>
+      Send to Sibling 2
+    </button>
+  );
+}
+
+// Sibling2.tsx
+import { useSelector } from "react-redux";
+function Sibling2() {
+  const message = useSelector((state: any) => state.message);
+  return <p>Received: {message}</p>;
+}
+```
+
+
