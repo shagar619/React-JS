@@ -4597,4 +4597,43 @@ function Sibling2() {
 }
 ```
 
+## How to create a switching component for displaying different pages?
 
+#### ⚡ Ways to Create a Switching Component in React
+
+**1. Using React Router v6 (Recommended)**
+
+React Router handles switching between pages based on the URL.
+```tsx
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+
+function Home() {
+  return <h2>🏠 Home Page</h2>;
+}
+
+function About() {
+  return <h2>ℹ️ About Page</h2>;
+}
+
+function Contact() {
+  return <h2>📞 Contact Page</h2>;
+}
+
+export default function App() {
+  return (
+    <Router>
+      <nav className="flex gap-4 p-4 bg-gray-100">
+        <Link to="/">Home</Link>
+        <Link to="/about">About</Link>
+        <Link to="/contact">Contact</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
+  );
+}
+```
