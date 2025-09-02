@@ -4147,3 +4147,32 @@ export default function App() {
 }
 ```
 
+📌 3. `useCallback()` Example (Stabilizing Function References)
+```tsx
+import React, { useState, useCallback } from "react";
+
+type ChildProps = { onClick: () => void };
+
+const Child = React.memo(({ onClick }: ChildProps) => {
+  console.log("Child re-rendered");
+  return <button onClick={onClick}>Click Me</button>;
+});
+
+export default function App() {
+  const [count, setCount] = useState(0);
+
+  // Without useCallback, new function is created on every render
+  const handleClick = useCallback(() => {
+    console.log("Clicked!");
+  }, []);
+
+  return (
+    <div>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(count + 1)}>Increment</button>
+      <Child onClick={handleClick} />
+    </div>
+  );
+}
+```
+
