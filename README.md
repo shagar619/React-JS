@@ -4117,3 +4117,33 @@ export default function App() {
   );
 }
 ```
+
+📌 2. `useMemo()` Example (Caching Expensive Calculations)
+```tsx
+import React, { useState, useMemo } from "react";
+
+function ExpensiveComponent({ num }: { num: number }) {
+  const expensiveCalculation = (n: number) => {
+    console.log("Calculating...");
+    return n * 1000; // Imagine this is expensive
+  };
+
+  const result = useMemo(() => expensiveCalculation(num), [num]);
+
+  return <h3>Result: {result}</h3>;
+}
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const [value, setValue] = useState(5);
+
+  return (
+    <div>
+      <button onClick={() => setCount(count + 1)}>Increment: {count}</button>
+      <ExpensiveComponent num={value} />
+      <button onClick={() => setValue(value + 1)}>Change Value</button>
+    </div>
+  );
+}
+```
+
