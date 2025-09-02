@@ -4637,3 +4637,116 @@ export default function App() {
   );
 }
 ```
+
+**2. Using State-Based Switching (Manual Switching Component)**
+
+Sometimes you don’t want routing — you just want to switch between components inside the same page.
+
+```tsx
+import { useState } from "react";
+
+function Home() {
+  return <h2>🏠 Home Page</h2>;
+}
+
+function About() {
+  return <h2>ℹ️ About Page</h2>;
+}
+
+function Contact() {
+  return <h2>📞 Contact Page</h2>;
+}
+
+export default function Switcher() {
+  const [page, setPage] = useState("home");
+
+  const renderPage = () => {
+    switch (page) {
+      case "home":
+        return <Home />;
+      case "about":
+        return <About />;
+      case "contact":
+        return <Contact />;
+      default:
+        return <Home />;
+    }
+  };
+
+  return (
+    <div>
+      <nav className="flex gap-4 p-4 bg-gray-100">
+        <button onClick={() => setPage("home")}>Home</button>
+        <button onClick={() => setPage("about")}>About</button>
+        <button onClick={() => setPage("contact")}>Contact</button>
+      </nav>
+      <div className="p-6">{renderPage()}</div>
+    </div>
+  );
+}
+```
+
+**3. Dynamic Component Mapping (Cleaner Version of #2)**
+
+```tsx
+import { useState } from "react";
+
+const pages: Record<string, JSX.Element> = {
+  home: <h2>🏠 Home Page</h2>,
+  about: <h2>ℹ️ About Page</h2>,
+  contact: <h2>📞 Contact Page</h2>,
+};
+
+export default function DynamicSwitcher() {
+  const [page, setPage] = useState("home");
+
+  return (
+    <div>
+      <nav className="flex gap-4 p-4 bg-gray-100">
+        {Object.keys(pages).map((key) => (
+          <button key={key} onClick={() => setPage(key)}>
+            {key}
+          </button>
+        ))}
+      </nav>
+      <div className="p-6">{pages[page]}</div>
+    </div>
+  );
+}
+```
+
+**4. Combining React Router with Protected Routes (Advanced Switching)**
+
+You can use a switching component to show different pages based on authentication state.
+```tsx
+import { Routes, Route, Navigate } from "react-router-dom";
+
+function Dashboard() {
+  return <h2>📊 Dashboard</h2>;
+}
+
+function Login() {
+  return <h2>🔑 Login Page</h2>;
+}
+
+function ProtectedRoute({ children }: { children: JSX.Element }) {
+  const isLoggedIn = localStorage.getItem("authToken"); // example
+  return isLoggedIn ? children : <Navigate to="/login" replace />;
+}
+
+export default function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
+```
