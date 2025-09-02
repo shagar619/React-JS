@@ -4251,3 +4251,29 @@ function TodoList({ todos }) {
 3. Children with Keys → Optimized Updates
    - Helps React reorder, add, or remove efficiently.
 
+
+## How to perform automatic redirect after login?
+
+#### ⚡ Ways to Perform Automatic Redirect After Login
+
+**1. Using React Router v6 `useNavigate` Hook (Most Common)**
+```tsx
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+export default function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      await axios.post("/api/login", { email: "test@test.com", password: "123456" });
+      navigate("/dashboard"); // ✅ redirect after login
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+  };
+
+  return <button onClick={handleLogin}>Login</button>;
+}
+```
