@@ -607,7 +607,7 @@ root.render(<ul>{updatedNums}</ul>);  // Render the list into the root element
 
 **Function Component Hooks**
 
-**Core Hooks:**
+**Core or Built-in Hooks:**
 - `useState()`: Manage local state in function components.
 - `useEffect()`: Manage side effects in function components.
 - `useContext()`: Access React context in function components.
@@ -1065,7 +1065,7 @@ export default function Post() {
 ```
 
 
-✅ Route actions + <Form>: mutations with built‑in navigation and validation
+✅ Route actions + `<Form>`: mutations with built‑in navigation and validation
 
 - Actions handle non-GET submissions. Use Form to submit without manual event handlers.
 - Return `redirect()` to navigate or `json()` with errors to show validation messages.
@@ -1311,6 +1311,52 @@ export function MyRoute() {
   );
 }
 ```
+
+
+## 🔹`npm` (Node Package Manager)
+
+- `npm` is the default package manager for Node.js, used to manage JavaScript packages and dependencies.
+- It allows developers to install, share, and manage libraries and tools for their projects.
+- `npm` uses a command-line interface (CLI) to interact with the package registry and manage packages.
+
+#### 🔧 How to use npm
+
+1. **Install Node.js and npm**: Download and install Node.js from the official website (https://nodejs.org/). npm is included with Node.js.
+2. **Initialize a new project**: Create a new directory for your project and run `npm init` to create a `package.json` file.
+```bash
+   mkdir my-project
+   cd my-project
+   npm init -y
+```
+3. **Install packages**: Use `npm install <package-name>` to install packages and add them to your `package.json` file.
+```bash
+   npm install react react-dom
+```
+4. **Use packages**: Import and use the installed packages in your JavaScript files.
+```javascript
+   const React = require('react');
+   const ReactDOM = require('react-dom');
+```
+5. **Update packages**: Use `npm update` to update installed packages to their latest versions.
+6. **Uninstall packages**: Use `npm uninstall <package-name>` to remove packages from your project.
+```bash
+   npm uninstall react
+```
+7. **Run scripts**: Define custom scripts in your `package.json` file and run them using `npm run <script-name>`.
+```json
+   "scripts": {
+     "start": "node index.js",
+     "test": "jest"
+   }
+```
+```bash
+   npm run start
+```
+
+#### 🎯 Where is npm used?
+- **Web Development**: Managing front-end libraries and frameworks like React, Angular, and Vue.js.
+- **Back-end Development**: Managing server-side packages for Node.js applications.
+- **Build Tools**: Managing tools like Webpack, Babel, and ESLint for building and optimizing projects.
 
 
 
